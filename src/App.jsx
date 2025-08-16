@@ -5,6 +5,7 @@ import React, { StrictMode, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
+import {  Tooltip, Button } from 'antd';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -32,15 +33,17 @@ const CompanyLogoRenderer = (params) => (
         }}
       />
     )}
-    <p
-      style={{
-        textOverflow: "ellipsis",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {params.value}
-    </p>
+        <p
+          style={{
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+          }}
+        >
+      <Tooltip title={params.value} placement='topLeft'>
+          {params.value}
+      </Tooltip>
+        </p>
   </span>
 );
 
@@ -118,6 +121,14 @@ const App = () => {
       cellRenderer: MissionResultRenderer,
     },
     { field: "rocket" },
+    { 
+      headerName: '판매 정보',
+      children: [
+          // 상반기 그룹의 children을 바로 가져옴
+          { field: 'h1Price'},
+          { field: 'h1Quantity'},
+      ]    
+    }
   ]);
 
   // Apply settings across all columns
