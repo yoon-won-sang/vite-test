@@ -123,10 +123,12 @@ const App = () => {
     { field: "rocket" },
     { 
       headerName: '판매 정보',
+      spanHeaderHeight: true,
+      headerStyle: {justifyContent: 'center', textAlign:'center'},
       children: [
           // 상반기 그룹의 children을 바로 가져옴
-          { field: 'h1Price'},
-          { field: 'h1Quantity'},
+          { field: 'location', headerStyle:{display: 'none'}},
+          { field: 'rocket', headerStyle:{display: 'none'}},
       ]    
     }
   ]);
@@ -154,6 +156,7 @@ const App = () => {
         onCellValueChanged={(event) =>
           console.log(`New Cell Value: ${event.value}`)
         }
+        headerHeight={20}
       />
     </div>
   );
