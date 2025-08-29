@@ -5,7 +5,8 @@ import React, { StrictMode, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import {  Tooltip, Button } from 'antd';
+import { Tooltip, Button } from 'antd';
+import ReactECharts from 'echarts-for-react';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -33,17 +34,17 @@ const CompanyLogoRenderer = (params) => (
         }}
       />
     )}
-        <p
-          style={{
-            textOverflow: "ellipsis",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-          }}
-        >
+    <p
+      style={{
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+      }}
+    >
       <Tooltip title={params.value} placement='topLeft'>
-          {params.value}
+        {params.value}
       </Tooltip>
-        </p>
+    </p>
   </span>
 );
 
@@ -69,12 +70,12 @@ const MissionResultRenderer = (params) => (
 
 /* Format Date Cells */
 const dateFormatter = (params) => {
-  return new Date(params.value).toLocaleDateString("ko-KR", {
-    weekday: "long",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  if (!params.value) return '';
+  const d = new Date(params.value);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}년 ${month}월 ${day}일`;
 };
 
 const rowSelection = {
@@ -103,6 +104,11 @@ const App = () => {
     {
       field: "location",
       width: 225,
+      cellRenderer: (params) => (
+        <Tooltip title={params.value} placement="topLeft">
+          <span style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}>{params.value}</span>
+        </Tooltip>
+      ),
     },
     {
       field: "date",
@@ -121,15 +127,14 @@ const App = () => {
       cellRenderer: MissionResultRenderer,
     },
     { field: "rocket" },
-    { 
+    {
       headerName: '판매 정보',
-      spanHeaderHeight: true,
-      headerStyle: {justifyContent: 'center', textAlign:'center'},
+      headerName: '상세',
+      colId: 'sales-detail',
       children: [
-          // 상반기 그룹의 children을 바로 가져옴
-          { field: 'location', headerStyle:{display: 'none'}},
-          { field: 'rocket', headerStyle:{display: 'none'}},
-      ]    
+        { field: 'location', headerName: '위치', width: 200 },
+        { field: 'rocket', headerName: '로켓', width: 200 },
+      ]
     }
   ]);
 
@@ -142,23 +147,61 @@ const App = () => {
     };
   }, []);
 
+
+  const options = {
+    // 범례(legend) 설정
+    grid: {
+      left: '10%', // 차트 왼쪽 여백을 10%로 설정
+      right: '10%', // 차트 오른쪽 여백을 10%로 설정
+      bottom: '10%', // 차트 아래쪽 여백을 10%로 설정
+      containLabel: true // 축 이름이 잘리지 않도록 그리드 영역을 확장
+    },
+    legend: {
+      data: ['매출', '비용'],
+      bottom: 0, // 범례를 하단에 배치
+    },
+    xAxis: {
+      type: 'category',
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    },
+    yAxis: { type: 'value' },
+    series: [
+      {
+        name: '매출', // 범례에 표시될 이름
+        data: [120, 200, 150, 80, 70, 110, 130],
+        type: 'bar',
+      },
+      {
+        name: '비용', // 범례에 표시될 이름
+        data: [100, 150, 120, 60, 50, 90, 100],
+        type: 'bar',
+      },
+    ],
+  };
+
   // Container: Defines the grid's theme & dimensions.
   return (
-    <div style={{ width: "100%", height: "500px" }}>
-      <AgGridReact
-        rowData={data}
-        loading={loading}
-        columnDefs={colDefs}
-        defaultColDef={defaultColDef}
-        pagination={true}
-        rowSelection={rowSelection}
-        onSelectionChanged={(event) => console.log("Row Selected!")}
-        onCellValueChanged={(event) =>
-          console.log(`New Cell Value: ${event.value}`)
-        }
-        headerHeight={20}
-      />
-    </div>
+    <>
+      <div style={{ width: "100%", height: "500px" }}>
+        <AgGridReact
+          rowData={data}
+          loading={loading}
+          columnDefs={colDefs}
+          defaultColDef={defaultColDef}
+          pagination={true}
+          rowSelection={rowSelection}
+          onSelectionChanged={(event) => console.log("Row Selected!")}
+          onCellValueChanged={(event) =>
+            console.log(`New Cell Value: ${event.value}`)
+          }
+          headerHeight={20}
+        />
+      </div>
+
+      <div style={{ width: '100%', height: '400px' }}>
+        <ReactECharts option={options} />
+      </div>
+    </>
   );
 };
 
