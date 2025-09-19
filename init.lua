@@ -8,8 +8,8 @@ vim.opt.nu = true
 vim.opt.rnu = true
 
 -- 탭 관련 설정
-vim.opt.tabstop = 4         -- 탭의 크기
-vim.opt.shiftwidth = 4      -- 자동 들여쓰기 크기
+vim.opt.tabstop = 2         -- 탭의 크기
+vim.opt.shiftwidth = 2      -- 자동 들여쓰기 크기
 vim.opt.expandtab = true    -- 탭을 공백으로 변환
 
 -- 검색 관련 설정
@@ -22,9 +22,12 @@ vim.opt.clipboard = "unnamedplus" -- 시스템 클립보드와 연동
 vim.opt.signcolumn = "yes"     -- 기호 열(sign column) 항상 표시
 vim.opt.ignorecase = true -- 대소문자 무시
 
+-- Yank 하이라이트
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback = function() vim.highlight.on_yank() end,
+})
 
 -- ~/.config/nvim/init.lua 파일 내용
-
 -- lazy.nvim 설치 코드 (lazy.nvim의 공식 문서를 참고하여 최신 코드를 사용하세요)
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -65,11 +68,20 @@ require("lazy").setup({
       require("lualine").setup({ options = { theme = "tokyonight", icons_enabled = true } })
     end,
   },  
--- 검색
+--------------------------------
+-- Telescope 키 매핑
+--------------------------------
   {
     'nvim-telescope/telescope.nvim',
     tag = '0.1.4', -- 원하는 버전으로 설정
     dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+        local telescope = require("telescope.builtin")
+        vim.keymap.set('n', '<leader>ff', telescope.find_files, { desc = '[F]ind [F]iles' })
+        vim.keymap.set('n', '<leader>fg', telescope.live_grep, { desc = '[F]ind by [G]rep' })
+        vim.keymap.set('n', '<leader>fb', telescope.buffers, { desc = '[F]ind [B]uffers' })
+        vim.keymap.set('n', '<leader>fh', telescope.help_tags, { desc = '[F]ind [H]elp Tags' })
+    end
   },  
  -- 카멜케이스 모션
   {
@@ -125,44 +137,37 @@ require("lazy").setup({
 -- 문법
   {
     'nvim-treesitter/nvim-treesitter',
+      build = ':TSUpdate',
+      event = {'BufReadPre', 'BufNewFile'},    
+     config = function()
+      require('nvim-treesitter.configs').setup({
+        -- 구문 강조
+        highlight = {
+          enable = true,
+          -- 코드 블록이나 주석 내에서 특정 언어만 비활성화
+          disable = {},
+        },
+        -- 증분 선택
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = '<C-space>',
+            node_incremental = '<C-space>',
+            scope_incremental = '<C-s>',
+            node_decremental = '<bs>',
+          },
+        },
+        -- 들여쓰기
+        indent = {
+          enable = true,
+        },
+        -- 설치할 언어
+        ensure_installed = {
+          'c', 'cpp', 'css', 'go', 'html', 'javascript', 'json', 'lua', 'python', 'rust', 'typescript', 'vimdoc', 'vim',
+        },
+      })
+     end
   }	
-})
-
--- treesitter 설정
-require('nvim-treesitter.configs').setup({
-  -- 설치할 언어 목록을 지정합니다.
-  -- :TSInstall <lang> 명령으로도 추가할 수 있습니다.
-  ensure_installed = { "c", "cpp", "lua", "vim", "vimdoc", "javascript", "typescript", "html", "css" },
-
-  -- 구문 강조(syntax highlighting) 활성화
-  highlight = {
-    enable = true,
-  },
-
-  -- 들여쓰기(indent) 활성화
-  indent = {
-    enable = true,
-  },
-})
-
-
-
---------------------------------
--- Telescope 키 매핑
---------------------------------
-local telescope = require("telescope.builtin")
-vim.keymap.set('n', '<leader>ff', telescope.find_files, { desc = '[F]ind [F]iles' })
-vim.keymap.set('n', '<leader>fg', telescope.live_grep, { desc = '[F]ind by [G]rep' })
-vim.keymap.set('n', '<leader>fb', telescope.buffers, { desc = '[F]ind [B]uffers' })
-vim.keymap.set('n', '<leader>fh', telescope.help_tags, { desc = '[F]ind [H]elp Tags' })
-
-
---------------------------------
--- 자동명령
---------------------------------
--- Yank 하이라이트
-vim.api.nvim_create_autocmd("TextYankPost", {
-  callback = function() vim.highlight.on_yank() end,
 })
 
 
