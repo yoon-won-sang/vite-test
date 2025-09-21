@@ -1,12 +1,13 @@
+// @ts-nocheck
 "use client";
 import { useFetchJson } from "./useFetchJson";
-// React Grid Logic
-import React, { StrictMode, useMemo, useState } from "react";
-// import { createRoot } from "react-dom/client";
+import { useMemo, useState } from "react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { Tooltip, Button } from "antd";
+import _ from "lodash";
 import ReactECharts from "echarts-for-react";
+import React from "react";
+import { Tooltip } from "antd";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -41,7 +42,7 @@ const CompanyLogoRenderer = (params) => (
         whiteSpace: "nowrap",
       }}
     >
-      <Tooltip title={params.value} placement="topLeft">
+      <Tokltip title={params.value} placement="topLeft">
         {params.value}
       </Tooltip>
     </p>
@@ -88,6 +89,7 @@ const App = () => {
   // Row Data: The data to be displayed.
   const { data, loading } = useFetchJson(
     "https://www.ag-grid.com/example-assets/space-mission-data.json",
+    1,
   );
 
   // Column Definitions: Defines & controls grid columns.
@@ -134,15 +136,15 @@ const App = () => {
     },
     {
       field: "date",
-      valueFormatter: dateFormatter,
+      // valueFormatter: dateFormatter,
       spanRows: true, // Enable row spanning for the 'date' column
     },
     {
       field: "price",
       width: 330,
-      valueFormatter: (params) => {
-        return "£" + params.value.toLocaleString();
-      },
+      // valueFormatter: (params) => {
+      //   return "£" + params.value.toLocaleString();
+      // },
     },
     {
       field: "successful",
@@ -271,11 +273,17 @@ const App = () => {
   // console.log(distinctColors);
   // 예시 출력: [ '#d770c0', '#7b71d6', '#72b647', '#5ac49f', '#d56860', '#638c5b', '#48c3ce', '#35639f' ]
 
+  const [gridApi, setGridApi] = useState(null);
   // Container: Defines the grid's theme & dimensions.
   return (
     <>
       <div style={{ width: "100%", height: "500px" }}>
         <AgGridReact
+          onGridReady={(params) => {
+            console.log("Grid is ready!", params);
+            // params.api, params.columnApi 등 사용 가능
+            setGridApi(params.api);
+          }}
           enableCellSpan={true}
           rowData={data}
           loading={loading}
@@ -291,11 +299,8 @@ const App = () => {
             // event.api.refreshCells({ force: true });
           }}
           onCellValueChanged={(event) => {
-            return console.log(
-              `onCellValueChanged New Cell Value: ${event.value}`,
-            );
+            const data = gridApi.getRenderedNodes().map((item) => item.data);
           }}
-          // headerHeight={20}
         />
       </div>
 

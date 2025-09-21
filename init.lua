@@ -1,4 +1,3 @@
-
 -- ============================
 -- 기본 설정
 -- ============================
@@ -139,11 +138,7 @@ require("lazy").setup({
   {
     "easymotion/vim-easymotion",
     config = function()
-      -- 기본 매핑 비활성화
       vim.g.EasyMotion_do_mapping = 0
-      -- <leader>를 한 번만 눌러 EasyMotion prefix 활성화
-      vim.api.nvim_set_keymap("n", "<leader>", "<Plug>(easymotion-prefix)", { noremap = false, silent = true })
-      vim.api.nvim_set_keymap("v", "<leader>", "<Plug>(easymotion-prefix)", { noremap = false, silent = true })      
       local opts = { noremap = true, silent = true }
       vim.api.nvim_set_keymap("n", "<leader>s", "<Plug>(easymotion-s)", opts)
       vim.api.nvim_set_keymap("n", "<leader>f", "<Plug>(easymotion-f)", opts)
@@ -233,7 +228,7 @@ require("lazy").setup({
                   ".eslintrc.cjs",
                   ".eslintrc.json",
                   "package.json",
-                  "elint.config.js"
+                  "eslint.config.js"
                 )(fname) or vim.loop.cwd()
               end,
             })
@@ -312,24 +307,24 @@ require("lazy").setup({
   },
   
   -- colorizer
-  {
-    "norcalli/nvim-colorizer.lua",
-    config = function()
-      require("colorizer").setup({
-        filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "css", "html" },
-        user_default_options = {
-          RGB = true, -- #RGB hex codes
-          RRGGBB = true, -- #RRGGBB hex codes
-          names = true, -- "Name" codes like Blue
-          RRGGBBAA = true, -- #RRGGBBAA hex codes
-          rgb_fn = true, -- CSS rgb() and rgba() functions
-          hsl_fn = true, -- CSS hsl() and hsla() functions
-          css = true, -- Enable all CSS features
-          css_fn = true, -- Enable all CSS *functions*
-          mode = "background", -- Set the display mode (background, foreground, or virtualtext)
-        },
-      })
-    end,
-  },
+  -- {
+  --   "norcalli/nvim-colorizer.lua",
+  --   config = function()
+  --     require("colorizer").setup({
+  --       filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "css", "html" },
+  --       user_default_options = {
+  --         RGB = true, -- #RGB hex codes
+  --         RRGGBB = true, -- #RRGGBB hex codes
+  --         names = true, -- "Name" codes like Blue
+  --         RRGGBBAA = true, -- #RRGGBBAA hex codes
+  --         rgb_fn = true, -- CSS rgb() and rgba() functions
+  --         hsl_fn = true, -- CSS hsl() and hsla() functions
+  --         css = true, -- Enable all CSS features
+  --         css_fn = true, -- Enable all CSS *functions*
+  --         mode = "background", -- Set the display mode (background, foreground, or virtualtext)
+  --       },
+  --     })
+  --   end,
+  -- },
 
 })
