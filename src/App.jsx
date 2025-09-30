@@ -207,7 +207,7 @@ const App = () => {
    * @param {number} h - Hue (0-360)
    * @param {number} s - Saturation (0-100)
    * @param {number} l - Lightness (0-100)
-   * @returns {string} 16진수 컬러 코드 (예: #AABBCC)
+   * @returns {string} 16진수 컬러 코드 ( 예: #AsaABBCC )
    */
   function hslToHex(h, s, l) {
     h /= 360;
@@ -254,7 +254,6 @@ const App = () => {
       const hue = i * step + Math.floor(Math.random() * step);
       const saturation = 80 + Math.random() * 20; // 채도를 높게
       const lightness = 60 + Math.random() * 10; // 명도를 중간 정도로 유지
-
       const hexColor = hslToHex(hue, saturation, lightness);
 
       // 중복 확인 후 Set에 추가
