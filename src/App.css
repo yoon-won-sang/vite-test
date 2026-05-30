@@ -158,3 +158,40 @@
     --ag-row-height: 40px;
   }
 }
+
+/* Login Page Styles */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FFF1F8 0%, #F0F7FF 50%, #F2FFF2 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.login-card .ant-card-head {
+  text-align: center;
+  border-bottom: none;
+  font-size: 1.5rem;
+  padding-top: 24px;
+}
+
+.login-form-button {
+  height: 45px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}

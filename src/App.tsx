@@ -2,19 +2,28 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { Form, Tag, Tabs, message } from 'antd'
+import { Form, Tag, Tabs, message, Button } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnsType } from 'antd/es/table'
 import type { GridApi, GridReadyEvent } from 'ag-grid-community'
-import { TableOutlined, FormOutlined, BgColorsOutlined, AppstoreAddOutlined } from '@ant-design/icons'
+import {
+  TableOutlined,
+  FormOutlined,
+  BgColorsOutlined,
+  AppstoreAddOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
 import GridSection from './components/GridSection'
 import Charts from './components/Charts'
+import LoginForm from './components/LoginForm'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [user, setUser] = useState<{ username: string } | null>(null)
   const [localRows, setLocalRows] = useState<Employee[]>([])
   const [searchText, setSearchText] = useState('')
   const [gridApi, setGridApi] = useState<GridApi | null>(null)
@@ -35,6 +44,7 @@ function App() {
       }))
     },
     staleTime: 1000 * 60 * 5,
+    enabled: isLoggedIn,
   })
 
   const fetchedRows = queryResult.data ?? []
@@ -45,6 +55,17 @@ function App() {
       message.error('Failed to load employee data from jsonplaceholder.')
     }
   }, [queryResult.isError])
+
+  const handleLogin = (values: { username: string }) => {
+    setIsLoggedIn(true)
+    setUser({ username: values.username })
+  }
+
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+    setUser(null)
+    message.info('Logged out successfully')
+  }
 
   const columnDefs = [
     { field: 'id', headerName: 'ID', width: 80, sortable: true, filter: true },
@@ -182,11 +203,18 @@ function App() {
     },
   ]
 
+  if (!isLoggedIn) {
+    return <LoginForm onLogin={handleLogin} />
+  }
+
   return (
     <div className="app-container">
+      <Button className="logout-btn" icon={<LogoutOutlined />} onClick={handleLogout} danger>
+        Logout
+      </Button>
       <div className="header">
         <h1>🚀 Vite + React + ag-Grid + Ant Design</h1>
-        <p>Employee Management System Example</p>
+        <p>Welcome, {user?.username}! Employee Management System Example</p>
       </div>
 
       <div className="content">
@@ -195,7 +223,8 @@ function App() {
 
       <footer className="footer">
         <p>
-          Built with <strong>Vite</strong> • <strong>React</strong> • <strong>ag-Grid</strong> • <strong>Ant Design</strong>
+          Built with <strong>Vite</strong> • <strong>React</strong> • <strong>ag-Grid</strong> •{' '}
+          <strong>Ant Design</strong>
         </p>
       </footer>
     </div>
