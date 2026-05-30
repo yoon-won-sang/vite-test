@@ -1,0 +1,108 @@
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Helvetica Neue', sans-serif;
+}
+
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 40px;
+  padding: 30px 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header p {
+  margin: 10px 0 0 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.card-section :global(.ant-card-head) {
+  border-bottom: 2px solid #667eea;
+}
+
+.ag-grid-wrapper {
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #e8e8e8;
+}
+
+.ag-grid-wrapper :global(.ag-root) {
+  font-family: inherit;
+}
+
+.ag-grid-wrapper :global(.ag-theme-quartz) {
+  --ag-header-background-color: #fafafa;
+  --ag-header-foreground-color: #262626;
+  --ag-header-cell-hover-background-color: #f0f0f0;
+  --ag-grid-size: 8px;
+  --ag-row-height: 48px;
+}
+
+.footer {
+  text-align: center;
+  color: white;
+  padding: 20px;
+  margin-top: 40px;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .content {
+    padding: 0 10px;
+  }
+
+  .card-section {
+    padding: 16px;
+  }
+
+  .ag-grid-wrapper :global(.ag-theme-quartz) {
+    --ag-row-height: 40px;
+  }
+}
