@@ -1,14 +1,15 @@
 .app-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FFF1F8 0%, #F0F7FF 50%, #F2FFF2 100%);
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
     'Helvetica Neue', sans-serif;
+  color: #333;
 }
 
 .header {
   text-align: center;
-  color: white;
+  color: #333;
   margin-bottom: 40px;
   padding: 30px 20px;
 }
@@ -43,7 +44,7 @@
 }
 
 .card-section :global(.ant-card-head) {
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #D9B3FF;
 }
 
 .ag-grid-wrapper {
@@ -67,7 +68,7 @@
 
 .footer {
   text-align: center;
-  color: white;
+  color: #333;
   padding: 20px;
   margin-top: 40px;
 }
@@ -76,6 +77,57 @@
   margin: 0;
   font-size: 0.95rem;
   opacity: 0.9;
+}
+
+/* Pastel Tab Colors */
+.content :global(.ant-tabs-tab) {
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+/* Tab 1: Pastel Pink */
+.content :global(.ant-tabs-tab:nth-child(1)) {
+  background-color: #FFB3D9;
+  color: #8B4A6D;
+}
+
+.content :global(.ant-tabs-tab:nth-child(1).ant-tabs-tab-active) {
+  background-color: #FF85C0 !important;
+  color: #6B2A4D !important;
+}
+
+/* Tab 2: Pastel Blue */
+.content :global(.ant-tabs-tab:nth-child(2)) {
+  background-color: #B3D9FF;
+  color: #4A7BA7;
+}
+
+.content :global(.ant-tabs-tab:nth-child(2).ant-tabs-tab-active) {
+  background-color: #85CBFF !important;
+  color: #2A5B87 !important;
+}
+
+/* Tab 3: Pastel Green */
+.content :global(.ant-tabs-tab:nth-child(3)) {
+  background-color: #B3FFB3;
+  color: #4A8B4A;
+}
+
+.content :global(.ant-tabs-tab:nth-child(3).ant-tabs-tab-active) {
+  background-color: #85FF85 !important;
+  color: #2A6B2A !important;
+}
+
+/* Tab 4: Pastel Purple */
+.content :global(.ant-tabs-tab:nth-child(4)) {
+  background-color: #E6B3FF;
+  color: #8B4AAE;
+}
+
+.content :global(.ant-tabs-tab:nth-child(4).ant-tabs-tab-active) {
+  background-color: #D985FF !important;
+  color: #6B2A8E !important;
 }
 
 @keyframes slideIn {

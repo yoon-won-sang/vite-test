@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { Form, Tag, message } from 'antd'
+import { Form, Tag, Tabs, message } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnsType } from 'antd/es/table'
 import type { GridApi, GridReadyEvent } from 'ag-grid-community'
+import { TableOutlined, FormOutlined, BgColorsOutlined, AppstoreAddOutlined } from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
 import GridSection from './components/GridSection'
+import Charts from './components/Charts'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 
@@ -135,14 +137,12 @@ function App() {
     },
   ]
 
-  return (
-    <div className="app-container">
-      <div className="header">
-        <h1>🚀 Vite + React + ag-Grid + Ant Design</h1>
-        <p>Employee Management System Example</p>
-      </div>
-
-      <div className="content">
+  const tabs = [
+    {
+      key: 'table',
+      label: 'AntD Table',
+      icon: <TableOutlined />,
+      children: (
         <EmployeeTable
           rowData={rowData}
           searchText={searchText}
@@ -151,9 +151,19 @@ function App() {
           antdColumns={antdColumns}
           loading={queryResult.isLoading}
         />
-
-        <EmployeeForm form={form} handleFormSubmit={handleFormSubmit} />
-
+      ),
+    },
+    {
+      key: 'form',
+      label: 'Employee Form',
+      icon: <FormOutlined />,
+      children: <EmployeeForm form={form} handleFormSubmit={handleFormSubmit} />,
+    },
+    {
+      key: 'grid',
+      label: 'ag-Grid',
+      icon: <BgColorsOutlined />,
+      children: (
         <GridSection
           rowData={rowData}
           columnDefs={columnDefs}
@@ -162,6 +172,25 @@ function App() {
           handleExport={handleExport}
           searchText={searchText}
         />
+      ),
+    },
+    {
+      key: 'empty',
+      label: 'Charts',
+      icon: <AppstoreAddOutlined />,
+      children: <Charts />,
+    },
+  ]
+
+  return (
+    <div className="app-container">
+      <div className="header">
+        <h1>🚀 Vite + React + ag-Grid + Ant Design</h1>
+        <p>Employee Management System Example</p>
+      </div>
+
+      <div className="content">
+        <Tabs defaultActiveKey="table" items={tabs} />
       </div>
 
       <footer className="footer">
