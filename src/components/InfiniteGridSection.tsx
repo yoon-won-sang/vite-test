@@ -106,11 +106,12 @@ function InfiniteGridSection({
             },
           })
 
-          const users = response.data.users as Array<{
+          interface DummyUser {
             id: number
             firstName: string
             lastName: string
-          }>
+          }
+          const users = response.data.users as DummyUser[]
           const rowsThisPage = users.map((u) => mapRemoteUserToEmployee(u))
           const totalCount = typeof response.data.total === 'number' ? response.data.total : null
 
@@ -139,22 +140,11 @@ function InfiniteGridSection({
     [],
   )
 
-  const handleGridReady = useCallback(
-    (params: GridReadyEvent) => {
-      setGridApi(params.api)
-      const rowModel = params.api.getModel() as IInfiniteRowModel
-      rowModel.setDatasource(datasource)
-      onGridReady(params.api)
-    },
-    [datasource, onGridReady],
-  )
-
-  useEffect(() => {
-    if (gridApi) {
-      const rowModel = gridApi.getModel() as IInfiniteRowModel
-      rowModel.setDatasource(datasource)
-    }
-  }, [gridApi, datasource])
+  const handleGridReady = (params: GridReadyEvent) => {
+    setGridApi(params.api)
+    ;(params.api.getModel() as IInfiniteRowModel).setDatasource(datasource)
+    onGridReady(params.api)
+  }
 
   return (
     <Card title="ag-Grid Infinite Scrolling" className="card-section">
