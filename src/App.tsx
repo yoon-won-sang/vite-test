@@ -5,7 +5,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { Form, Tag, Tabs, message, Button } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnsType } from 'antd/es/table'
-import type { GridApi, GridReadyEvent } from 'ag-grid-community'
+import type { GridApi } from 'ag-grid-community'
 import {
   TableOutlined,
   FormOutlined,
@@ -15,7 +15,7 @@ import {
 } from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
-import GridSection from './components/GridSection'
+import InfiniteGridSection from './components/InfiniteGridSection'
 import Charts from './components/Charts'
 import LoginForm from './components/LoginForm'
 import type { Employee, EmployeeFormValues } from './types/employee'
@@ -85,15 +85,8 @@ function App() {
     },
   ]
 
-  const onGridReady = (params: GridReadyEvent) => {
-    setGridApi(params.api)
-  }
-
   const handleSearch = (value: string) => {
     setSearchText(value)
-    if (gridApi) {
-      ;(gridApi as any).setQuickFilter(value)
-    }
   }
 
   const handleAddEmployee = () => {
@@ -182,15 +175,14 @@ function App() {
     },
     {
       key: 'grid',
-      label: 'ag-Grid',
+      label: 'ag-Grid Infinite Scroll',
       icon: <BgColorsOutlined />,
       children: (
-        <GridSection
-          rowData={rowData}
+        <InfiniteGridSection
           columnDefs={columnDefs}
-          onGridReady={onGridReady}
           handleSearch={handleSearch}
           handleExport={handleExport}
+          onGridReady={(api) => setGridApi(api)}
           searchText={searchText}
         />
       ),
