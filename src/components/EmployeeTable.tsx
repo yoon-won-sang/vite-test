@@ -1,5 +1,5 @@
 import { Card, Input, Space, Table, Button } from 'antd'
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons'
+import { SearchOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import type { Employee } from '../types/employee'
 
@@ -10,13 +10,22 @@ interface EmployeeTableProps {
   handleAddEmployee: () => void
   antdColumns: ColumnsType<Employee>
   loading: boolean
+  handleExcelExport: () => void
 }
 
-function EmployeeTable({ rowData, searchText, setSearchText, handleAddEmployee, antdColumns, loading }: EmployeeTableProps) {
+function EmployeeTable({
+  rowData,
+  searchText,
+  setSearchText,
+  handleAddEmployee,
+  antdColumns,
+  loading,
+  handleExcelExport,
+}: EmployeeTableProps) {
   return (
     <Card title="Ant Design Table Component" className="card-section">
       <Space direction="vertical" style={{ width: '100%', gap: '16px' }}>
-        <Space>
+        <Space wrap>
           <Input.Search
             placeholder="Search employees..."
             prefix={<SearchOutlined />}
@@ -28,6 +37,9 @@ function EmployeeTable({ rowData, searchText, setSearchText, handleAddEmployee, 
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAddEmployee}>
             Add Employee
           </Button>
+          <Button icon={<FileExcelOutlined />} onClick={handleExcelExport}>
+            Export to Excel
+          </Button>
         </Space>
         <Table
           columns={antdColumns}
@@ -35,7 +47,7 @@ function EmployeeTable({ rowData, searchText, setSearchText, handleAddEmployee, 
             (item) =>
               searchText === '' ||
               item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-              item.department.toLowerCase().includes(searchText.toLowerCase())
+              item.department.toLowerCase().includes(searchText.toLowerCase()),
           )}
           rowKey="id"
           pagination={{ pageSize: 5 }}

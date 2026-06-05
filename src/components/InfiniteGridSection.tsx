@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { Card, Button, Input, Space, Spin, Typography, message } from 'antd'
+import { FileExcelOutlined, DownloadOutlined } from '@ant-design/icons'
 import { AgGridReact } from 'ag-grid-react'
 import type {
   ColDef,
@@ -74,6 +75,7 @@ interface InfiniteGridSectionProps {
   columnDefs: ColDef[]
   handleSearch: (value: string) => void
   handleExport: () => void
+  handleExcelExport: () => void
   onGridReady: (api: GridApi) => void
   searchText: string
 }
@@ -83,6 +85,7 @@ function InfiniteGridSection({
   handleSearch,
   handleExport,
   onGridReady,
+  handleExcelExport,
   searchText,
 }: InfiniteGridSectionProps) {
   const [gridApi, setGridApi] = useState<GridApi | null>(null)
@@ -156,8 +159,16 @@ function InfiniteGridSection({
           value={searchText}
           onChange={(e) => handleSearch(e.target.value)}
         />
-        <Button type="primary" onClick={handleExport} disabled={!gridApi}>
-          Export visible rows
+        <Button icon={<DownloadOutlined />} onClick={handleExport} disabled={!gridApi}>
+          Export CSV
+        </Button>
+        <Button
+          type="primary"
+          icon={<FileExcelOutlined />}
+          onClick={handleExcelExport}
+          disabled={!gridApi}
+        >
+          Excel Export
         </Button>
         <Typography.Text type="secondary">
           Total rows available: {totalRows ?? 'Loading...'}
@@ -180,12 +191,8 @@ function InfiniteGridSection({
                 floatingFilter: true,
               }}
               rowModelType="infinite"
-              cacheBlockSize={20}
-              maxBlocksInCache={1}
-              cacheOverflowSize={0}
-              rowBuffer={0}
-              infiniteInitialRowCount={20}
-              suppressPaginationPanel={true}
+              cacheBlockSize={20} // 한 번에 불러올 로우 수
+              infiniteInitialRowCount={20} // 초기 렌더링 시 보여줄 빈 로우 수
               onGridReady={handleGridReady}
             />
           </div>
