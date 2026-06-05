@@ -12,6 +12,7 @@ import {
   BgColorsOutlined,
   AppstoreAddOutlined,
   LogoutOutlined,
+  FileExcelOutlined,
 } from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
@@ -100,6 +101,32 @@ function App() {
     }
   }
 
+  const handleExcelExport = () => {
+    if (gridApi) {
+      // AG Grid Enterprise가 활성화된 경우 gridApi.exportDataAsExcel()을 사용할 수 있습니다.
+      // 현재는 Community 버전이므로 엑셀에서 바로 호환되는 CSV 포맷으로 내보내기를 구현합니다.
+      const params = {
+        fileName: `employees_export_${new Date().getTime()}.csv`,
+        columnSeparator: ',',
+      }
+      gridApi.exportDataAsCsv(params)
+      message.success('Grid data exported for Excel!')
+    } else if (rowData.length > 0) {
+      // Grid가 없는 탭(예: AntD Table)에서도 동작하도록 기본 rowData를 기반으로 내보내기를 시도합니다.
+      const headers = ['ID', 'Name', 'Age', 'Department', 'Status']
+      const csv = [
+        headers.join(','),
+        ...rowData.map((r) => `${r.id},"${r.name}",${r.age},"${r.department}","${r.status}"`),
+      ].join('\n')
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `employees_table_${new Date().getTime()}.csv`
+      link.click()
+      message.success('Table data exported!')
+    }
+  }
+
   const [form] = Form.useForm<EmployeeFormValues>()
 
   const handleFormSubmit = (values: EmployeeFormValues) => {
@@ -164,6 +191,7 @@ function App() {
           handleAddEmployee={handleAddEmployee}
           antdColumns={antdColumns}
           loading={queryResult.isLoading}
+          handleExcelExport={handleExcelExport}
         />
       ),
     },
@@ -182,6 +210,7 @@ function App() {
           columnDefs={columnDefs}
           handleSearch={handleSearch}
           handleExport={handleExport}
+          handleExcelExport={handleExcelExport}
           onGridReady={(api) => setGridApi(api)}
           searchText={searchText}
         />
