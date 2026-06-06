@@ -12,10 +12,12 @@ import {
   BgColorsOutlined,
   AppstoreAddOutlined,
   LogoutOutlined,
+  CheckSquareOutlined,
 } from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
 import InfiniteGridSection from './components/InfiniteGridSection'
+import CheckboxGridSection from './components/CheckboxGridSection'
 import Charts from './components/Charts'
 import LoginForm from './components/LoginForm'
 import type { Employee, EmployeeFormValues } from './types/employee'
@@ -214,6 +216,12 @@ function App() {
           searchText={searchText}
         />
       ),
+    },
+    {
+      key: 'checkbox-grid',
+      label: 'Checkbox Selection',
+      icon: <CheckSquareOutlined />,
+      children: <CheckboxGridSection rowData={rowData} />,
     },
     {
       key: 'empty',
