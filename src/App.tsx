@@ -12,7 +12,6 @@ import {
   BgColorsOutlined,
   AppstoreAddOutlined,
   LogoutOutlined,
-  FileExcelOutlined,
 } from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
