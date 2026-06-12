@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { Form, Tag, Tabs, message, Button } from 'antd'
+import { Form, Tabs, message, Button, Tag } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnsType } from 'antd/es/table'
 import type { GridApi } from 'ag-grid-community'
@@ -13,12 +13,15 @@ import {
   AppstoreAddOutlined,
   LogoutOutlined,
   CheckSquareOutlined,
+  SettingOutlined,
 } from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
 import InfiniteGridSection from './components/InfiniteGridSection'
 import CheckboxGridSection from './components/CheckboxGridSection'
+import ColumnHandlingSection from './components/ColumnHandlingSection'
 import Charts from './components/Charts'
+import Working from './components/Working.tsx'
 import LoginForm from './components/LoginForm'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
@@ -228,6 +231,18 @@ function App() {
       label: 'Charts',
       icon: <AppstoreAddOutlined />,
       children: <Charts />,
+    },
+    {
+      key: 'example',
+      label: 'Working',
+      icon: <AppstoreAddOutlined />,
+      children: <Working rowData={rowData} />,
+    },
+    {
+      key: 'column-handling',
+      label: 'Column Handling',
+      icon: <SettingOutlined />,
+      children: <ColumnHandlingSection rowData={rowData} />,
     },
   ]
 
