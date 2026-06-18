@@ -3,6 +3,7 @@ import { AgGridReact } from 'ag-grid-react'
 import { useState, useMemo, useEffect } from 'react'
 import type { ColDef, GridReadyEvent, GridApi } from 'ag-grid-community'
 import type { Employee } from '../types/employee'
+import _ from 'lodash'
 
 interface CheckboxGridSectionProps {
   rowData: Employee[]
@@ -82,6 +83,9 @@ function CheckboxGridSection({ rowData }: CheckboxGridSectionProps) {
 
       message.info(summary)
       console.log('Current Grid Data:', rows)
+
+      const omitR = _.omit(['a', 'b', 'c', 'd'], ['d'])
+      console.log('🚀 ~ InfiniteGridSection ~ omitR:', omitR)
     }
   }
 
