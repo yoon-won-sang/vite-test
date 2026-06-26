@@ -1,7 +1,11 @@
 import React from 'react'
 import { Form, Input, Button, Card, message } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
-import type { LoginValues } from '../types/auth' // 실제 경로에 맞게 조정 필요
+
+interface LoginValues {
+  username: string
+  password: string
+}
 
 interface LoginFormProps {
   onLogin: (values: LoginValues) => void

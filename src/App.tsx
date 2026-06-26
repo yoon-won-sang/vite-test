@@ -19,6 +19,7 @@ import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
 import InfiniteGridSection from './components/InfiniteGridSection'
 import CheckboxGridSection from './components/CheckboxGridSection'
+import CheckboxMatrixExample from './components/CheckboxMatrixExample'
 import ColumnHandlingSection from './components/ColumnHandlingSection'
 import Charts from './components/Charts'
 import Working from './components/Working.tsx'
@@ -237,6 +238,12 @@ function App() {
       label: 'Working',
       icon: <AppstoreAddOutlined />,
       children: <Working rowData={rowData} />,
+    },
+    {
+      key: 'checkbox-matrix',
+      label: 'Checkbox Matrix',
+      icon: <CheckSquareOutlined />,
+      children: <CheckboxMatrixExample />,
     },
     {
       key: 'column-handling',
