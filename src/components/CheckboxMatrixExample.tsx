@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import type { ColDef } from 'ag-grid-community'
 
 const TOTAL_ROWS = 300
-const TOTAL_COLUMNS = 150
+const TOTAL_COLUMNS = 200
 
 function CheckboxMatrixExample() {
   const columnDefs = useMemo<ColDef[]>(() => {
@@ -20,7 +20,6 @@ function CheckboxMatrixExample() {
     return [
       {
         field: 'rowLabel',
-        // headerName: 'Row',
         width: 110,
         pinned: 'left',
         suppressMovable: true,
@@ -37,14 +36,14 @@ function CheckboxMatrixExample() {
         }
 
         for (let colIndex = 0; colIndex < TOTAL_COLUMNS; colIndex += 1) {
-          row[`col_${colIndex + 1}`] = (rowIndex + colIndex) % 2 === 0
+          row[`col_${colIndex + 1}`] = (rowIndex + colIndex) % 4 === 0
         }
 
         return row
       }),
     [],
   )
-
+  console.log('rowData', rowData)
   return (
     <Card title="ag-Grid Checkbox Matrix Example" className="card-section">
       <div className="ag-theme-quartz" style={{ width: '100%', height: '500px' }}>
@@ -61,7 +60,7 @@ function CheckboxMatrixExample() {
           // rowSelection="multiple"
           rowBuffer={0}
           suppressAnimationFrame={true}
-          headerHeight={30}
+          headerHeight={60}
         />
       </div>
     </Card>
