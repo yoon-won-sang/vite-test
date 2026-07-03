@@ -22,6 +22,7 @@ import CheckboxGridSection from './components/CheckboxGridSection'
 import CheckboxMatrixExample from './components/CheckboxMatrixExample'
 import ColumnHandlingSection from './components/ColumnHandlingSection'
 import Charts from './components/Charts'
+import BrushExample from './components/BrushExample'
 import Working from './components/Working.tsx'
 import LoginForm from './components/LoginForm'
 import type { Employee, EmployeeFormValues } from './types/employee'
@@ -232,6 +233,12 @@ function App() {
       label: 'Charts',
       icon: <AppstoreAddOutlined />,
       children: <Charts />,
+    },
+    {
+      key: 'brush',
+      label: 'Brush Example',
+      icon: <AppstoreAddOutlined />,
+      children: <BrushExample />,
     },
     {
       key: 'example',
