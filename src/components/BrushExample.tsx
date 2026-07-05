@@ -472,6 +472,14 @@ const BrushExample: React.FC = () => {
           {showSelectedValues ? 'Hide Selected Values' : 'Show Selected Values'}
         </button>
       </div>
+      <div style={{ background: 'white', padding: 12, borderRadius: 10 }}>
+        <ReactECharts
+          option={option}
+          notMerge={true}
+          onChartReady={handleChartReady}
+          style={{ height: 440, width: '100%' }}
+        />
+      </div>
       {showSelectedValues && (
         <div
           style={{
@@ -499,14 +507,6 @@ const BrushExample: React.FC = () => {
           )}
         </div>
       )}
-      <div style={{ background: 'white', padding: 12, borderRadius: 10 }}>
-        <ReactECharts
-          option={option}
-          notMerge={true}
-          onChartReady={handleChartReady}
-          style={{ height: 440, width: '100%' }}
-        />
-      </div>
     </div>
   )
 }
