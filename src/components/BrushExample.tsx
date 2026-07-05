@@ -20,13 +20,20 @@ const MIN_SIZE = 20
 
 const BrushExample: React.FC = () => {
   const chartRef = useRef<any>(null)
-  const dragStateRef = useRef<{ startX: number; startY: number; color: 'blue' | 'red' } | null>(
-    null,
-  )
+  const dragStateRef = useRef<{
+    mode: 'create' | 'move' | 'resize'
+    rectId?: string
+    corner?: 'nw' | 'ne' | 'sw' | 'se'
+    startX: number
+    startY: number
+    startRect?: BrushRect
+  } | null>(null)
   const brushColorRef = useRef<'blue' | 'red'>('blue')
   const [brushColor, setBrushColor] = useState<'blue' | 'red'>('blue')
   const [brushRects, setBrushRects] = useState<BrushRect[]>([])
   const [tempRect, setTempRect] = useState<BrushRect | null>(null)
+  const [selectedSeriesValues, setSelectedSeriesValues] = useState<[number, number][]>([])
+  const [showSelectedValues, setShowSelectedValues] = useState(false)
 
   const data = useMemo(
     () => [
@@ -69,6 +76,29 @@ const BrushExample: React.FC = () => {
     }
   }, [])
 
+  const getSeriesValuesInRect = useCallback(
+    (rect: BrushRect | null) => {
+      if (!rect) return [] as [number, number][]
+
+      const chart = chartRef.current
+      if (!chart?.convertToPixel) return [] as [number, number][]
+
+      const x1 = rect.x
+      const y1 = rect.y
+      const x2 = rect.x + rect.width
+      const y2 = rect.y + rect.height
+
+      return data.filter(([x, y]) => {
+        const [pixelX, pixelY] = chart.convertToPixel({ seriesIndex: 0 }, [x, y]) as [
+          number,
+          number,
+        ]
+        return pixelX >= x1 && pixelX <= x2 && pixelY >= y1 && pixelY <= y2
+      }) as [number, number][]
+    },
+    [data],
+  )
+
   const createGraphicElements = useCallback(
     (rects: BrushRect[]) =>
       rects.flatMap((rect) => {
@@ -86,15 +116,19 @@ const BrushExample: React.FC = () => {
             stroke: palette[rect.color].stroke,
             lineWidth: 2,
           },
-          draggable: true,
           cursor: 'move',
           z: 100,
-          ondrag: (event: any) => {
-            const nextX = event.target.shape.x
-            const nextY = event.target.shape.y
-            setBrushRects((prev) =>
-              prev.map((r) => (r.id === rect.id ? { ...r, x: nextX, y: nextY } : r)),
-            )
+          onmousedown: (event: any) => {
+            event?.stopPropagation?.()
+            event?.preventDefault?.()
+            const { x, y } = getEventXY(event)
+            dragStateRef.current = {
+              mode: 'move',
+              rectId: rect.id,
+              startX: x,
+              startY: y,
+              startRect: rect,
+            }
           },
         }
 
@@ -123,58 +157,25 @@ const BrushExample: React.FC = () => {
             lineWidth: 2,
           },
           cursor,
-          draggable: true,
           z: 101,
-          ondrag: (event: any) => {
-            const nextX = event.target.shape.cx
-            const nextY = event.target.shape.cy
-            setBrushRects((prev) =>
-              prev.map((r) => {
-                if (r.id !== rect.id) return r
-                const left = r.x
-                const top = r.y
-                const right = r.x + r.width
-                const bottom = r.y + r.height
-                switch (corner) {
-                  case 'nw':
-                    return {
-                      ...r,
-                      x: Math.min(nextX, right - MIN_SIZE),
-                      y: Math.min(nextY, bottom - MIN_SIZE),
-                      width: Math.max(MIN_SIZE, right - nextX),
-                      height: Math.max(MIN_SIZE, bottom - nextY),
-                    }
-                  case 'ne':
-                    return {
-                      ...r,
-                      y: Math.min(nextY, bottom - MIN_SIZE),
-                      width: Math.max(MIN_SIZE, nextX - left),
-                      height: Math.max(MIN_SIZE, bottom - nextY),
-                    }
-                  case 'sw':
-                    return {
-                      ...r,
-                      x: Math.min(nextX, right - MIN_SIZE),
-                      width: Math.max(MIN_SIZE, right - nextX),
-                      height: Math.max(MIN_SIZE, nextY - top),
-                    }
-                  case 'se':
-                    return {
-                      ...r,
-                      width: Math.max(MIN_SIZE, nextX - left),
-                      height: Math.max(MIN_SIZE, nextY - top),
-                    }
-                  default:
-                    return r
-                }
-              }),
-            )
+          onmousedown: (event: any) => {
+            event?.stopPropagation?.()
+            event?.preventDefault?.()
+            const { x, y } = getEventXY(event)
+            dragStateRef.current = {
+              mode: 'resize',
+              rectId: rect.id,
+              corner,
+              startX: x,
+              startY: y,
+              startRect: rect,
+            }
           },
         }))
 
         return [rectGraphic, ...handlePoints]
       }),
-    [],
+    [getEventXY],
   )
 
   const option = useMemo<EChartsOption>(() => {
@@ -228,46 +229,154 @@ const BrushExample: React.FC = () => {
       const shouldIgnoreTarget = (target: any) => {
         if (!target) return false
         if (typeof target.id === 'string') {
-          return target.id.startsWith('brush-') || target.id === '__temp__'
+          return (
+            target.id.startsWith('brush-') ||
+            target.id === '__temp__' ||
+            target.id.includes('-handle-')
+          )
         }
         return false
-      }
-
-      const handleMouseDown = (event: any) => {
-        if (event.which !== 1) return
-        if (shouldIgnoreTarget(event.target)) return
-        const { x, y } = getEventXY(event)
-        dragStateRef.current = { startX: x, startY: y, color: brushColorRef.current }
-        setTempRect({ id: '__temp__', x, y, width: 0, height: 0, color: brushColorRef.current })
       }
 
       const handleMouseMove = (event: any) => {
         if (!dragStateRef.current) return
         const { x, y } = getEventXY(event)
-        const { startX, startY, color } = dragStateRef.current
-        const rectX = Math.min(startX, x)
-        const rectY = Math.min(startY, y)
-        const width = Math.abs(x - startX)
-        const height = Math.abs(y - startY)
-        setTempRect({ id: '__temp__', x: rectX, y: rectY, width, height, color })
-      }
+        const state = dragStateRef.current
 
-      const handleMouseUp = () => {
-        if (!dragStateRef.current) return
-        dragStateRef.current = null
-        setTempRect((current) => {
-          if (!current || current.width < MIN_SIZE || current.height < MIN_SIZE) return null
-          setBrushRects((prev) => [...prev, { ...current, id: `brush-${Date.now()}` }])
-          return null
+        if (state.mode === 'create') {
+          const rectX = Math.min(state.startX, x)
+          const rectY = Math.min(state.startY, y)
+          const width = Math.abs(x - state.startX)
+          const height = Math.abs(y - state.startY)
+          setTempRect({
+            id: '__temp__',
+            x: rectX,
+            y: rectY,
+            width,
+            height,
+            color: brushColorRef.current,
+          })
+          return
+        }
+
+        if (state.mode === 'move') {
+          const startRect = state.startRect
+          if (!startRect || !state.rectId) return
+          const dx = x - state.startX
+          const dy = y - state.startY
+          setBrushRects((prev) => {
+            const nextRects = prev.map((rect) =>
+              rect.id === state.rectId
+                ? {
+                    ...rect,
+                    x: startRect.x + dx,
+                    y: startRect.y + dy,
+                  }
+                : rect,
+            )
+
+            const movedRect = nextRects.find((rect) => rect.id === state.rectId)
+            if (movedRect) {
+              setSelectedSeriesValues(getSeriesValuesInRect(movedRect))
+              setShowSelectedValues(true)
+            }
+
+            return nextRects
+          })
+          return
+        }
+
+        if (!state.startRect || !state.rectId) return
+        const nextX = x
+        const nextY = y
+        const left = state.startRect.x
+        const top = state.startRect.y
+        const right = left + state.startRect.width
+        const bottom = top + state.startRect.height
+
+        setBrushRects((prev) => {
+          const nextRects = prev.map((rect) => {
+            if (rect.id !== state.rectId) return rect
+            switch (state.corner) {
+              case 'nw':
+                return {
+                  ...rect,
+                  x: Math.min(nextX, right - MIN_SIZE),
+                  y: Math.min(nextY, bottom - MIN_SIZE),
+                  width: Math.max(MIN_SIZE, right - nextX),
+                  height: Math.max(MIN_SIZE, bottom - nextY),
+                }
+              case 'ne':
+                return {
+                  ...rect,
+                  y: Math.min(nextY, bottom - MIN_SIZE),
+                  width: Math.max(MIN_SIZE, nextX - left),
+                  height: Math.max(MIN_SIZE, bottom - nextY),
+                }
+              case 'sw':
+                return {
+                  ...rect,
+                  x: Math.min(nextX, right - MIN_SIZE),
+                  width: Math.max(MIN_SIZE, right - nextX),
+                  height: Math.max(MIN_SIZE, nextY - top),
+                }
+              case 'se':
+                return {
+                  ...rect,
+                  width: Math.max(MIN_SIZE, nextX - left),
+                  height: Math.max(MIN_SIZE, nextY - top),
+                }
+              default:
+                return rect
+            }
+          })
+
+          const resizedRect = nextRects.find((rect) => rect.id === state.rectId)
+          if (resizedRect) {
+            setSelectedSeriesValues(getSeriesValuesInRect(resizedRect))
+            setShowSelectedValues(true)
+          }
+
+          return nextRects
         })
       }
 
-      zr.on('mousedown', handleMouseDown)
+      const handleMouseUp = () => {
+        const state = dragStateRef.current
+        dragStateRef.current = null
+
+        if (state?.mode === 'create') {
+          setTempRect((current) => {
+            if (!current || current.width < MIN_SIZE || current.height < MIN_SIZE) return null
+            const nextRect = { ...current, id: `brush-${Date.now()}` }
+            setBrushRects((prev) => [...prev, nextRect])
+            setSelectedSeriesValues(getSeriesValuesInRect(nextRect))
+            setShowSelectedValues(true)
+            return null
+          })
+        }
+      }
+
+      const handleGlobalMouseDown = (event: any) => {
+        if (event.which !== 1) return
+        if (shouldIgnoreTarget(event.target)) return
+        event?.stopPropagation?.()
+        event?.preventDefault?.()
+        const { x, y } = getEventXY(event)
+        dragStateRef.current = {
+          mode: 'create',
+          startX: x,
+          startY: y,
+        }
+        setTempRect({ id: '__temp__', x, y, width: 0, height: 0, color: brushColorRef.current })
+      }
+
+      zr.on('mousedown', handleGlobalMouseDown)
       zr.on('mousemove', handleMouseMove)
       zr.on('mouseup', handleMouseUp)
 
       return () => {
-        zr.off('mousedown', handleMouseDown)
+        zr.off('mousedown', handleGlobalMouseDown)
         zr.off('mousemove', handleMouseMove)
         zr.off('mouseup', handleMouseUp)
       }
@@ -293,6 +402,8 @@ const BrushExample: React.FC = () => {
   const handleClear = () => {
     setBrushRects([])
     setTempRect(null)
+    setSelectedSeriesValues([])
+    setShowSelectedValues(false)
   }
 
   return (
@@ -346,7 +457,48 @@ const BrushExample: React.FC = () => {
         >
           Clear All
         </button>
+        <button
+          type="button"
+          onClick={() => setShowSelectedValues((prev) => !prev)}
+          style={{
+            border: '1px solid #006cff',
+            background: '#f4f9ff',
+            color: '#0047b3',
+            padding: '8px 14px',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          {showSelectedValues ? 'Hide Selected Values' : 'Show Selected Values'}
+        </button>
       </div>
+      {showSelectedValues && (
+        <div
+          style={{
+            marginBottom: 12,
+            padding: 12,
+            border: '1px solid #d9e7ff',
+            borderRadius: 8,
+            background: '#f8fbff',
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 8 }}>Selected Series Values</div>
+          {selectedSeriesValues.length > 0 ? (
+            <pre
+              style={{
+                margin: 0,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontSize: 12,
+              }}
+            >
+              {JSON.stringify(selectedSeriesValues, null, 2)}
+            </pre>
+          ) : (
+            <div style={{ color: '#666' }}>선택된 영역이 없습니다.</div>
+          )}
+        </div>
+      )}
       <div style={{ background: 'white', padding: 12, borderRadius: 10 }}>
         <ReactECharts
           option={option}
