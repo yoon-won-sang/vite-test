@@ -25,6 +25,8 @@ import Charts from './components/Charts'
 import BrushExample from './components/BrushExample'
 import Working from './components/Working.tsx'
 import LoginForm from './components/LoginForm'
+import TrigonometricChart from './components/TrigonometricChart'
+import SimpleScatterChart from './components/SimpleScatterChart'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 
@@ -239,6 +241,18 @@ function App() {
       label: 'Brush Example',
       icon: <AppstoreAddOutlined />,
       children: <BrushExample />,
+    },
+    {
+      key: 'trigonometric',
+      label: 'Trigonometric Chart',
+      icon: <AppstoreAddOutlined />,
+      children: <TrigonometricChart />,
+    },
+    {
+      key: 'simple-scatter',
+      label: 'Simple Scatter Chart',
+      icon: <AppstoreAddOutlined />,
+      children: <SimpleScatterChart />,
     },
     {
       key: 'example',

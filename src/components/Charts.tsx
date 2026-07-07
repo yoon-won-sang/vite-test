@@ -55,6 +55,7 @@ const Charts: React.FC = () => {
   }
 
   const scatterOption = {
+    tooltip: { trigger: 'item' },
     xAxis: {},
     yAxis: {},
     series: [
