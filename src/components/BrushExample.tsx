@@ -1,6 +1,8 @@
 import type { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { Modal, Button } from 'antd'
+import type { SetStateAction } from 'react'
 
 type BrushRect = {
   id: string
@@ -18,7 +20,27 @@ const palette = {
 
 const MIN_SIZE = 20
 
-const BrushExample: React.FC = () => {
+interface BrushExampleContentProps {
+  brushRects: BrushRect[]
+  setBrushRects: React.Dispatch<SetStateAction<BrushRect[]>>
+  brushColor: 'blue' | 'red'
+  setBrushColor: React.Dispatch<SetStateAction<'blue' | 'red'>>
+  selectedSeriesValues: [number, number][]
+  setSelectedSeriesValues: React.Dispatch<SetStateAction<[number, number][]>>
+  showSelectedValues: boolean
+  setShowSelectedValues: React.Dispatch<SetStateAction<boolean>>
+}
+
+const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
+  brushRects,
+  setBrushRects,
+  brushColor,
+  setBrushColor,
+  selectedSeriesValues,
+  setSelectedSeriesValues,
+  showSelectedValues,
+  setShowSelectedValues,
+}) => {
   const chartRef = useRef<any>(null)
   const dragStateRef = useRef<{
     mode: 'create' | 'move' | 'resize'
@@ -29,15 +51,11 @@ const BrushExample: React.FC = () => {
     startRect?: BrushRect
   } | null>(null)
   const brushColorRef = useRef<'blue' | 'red'>('blue')
-  const [brushColor, setBrushColor] = useState<'blue' | 'red'>('blue')
-  const [brushRects, setBrushRects] = useState<BrushRect[]>([])
   const [tempRect, setTempRect] = useState<BrushRect | null>(null)
-  const [selectedSeriesValues, setSelectedSeriesValues] = useState<[number, number][]>([])
-  const [showSelectedValues, setShowSelectedValues] = useState(false)
 
   const data = useMemo(
     () =>
-      Array.from({ length: 5000 }, () => [Math.random() * 15, Math.random() * 15]) as [
+      Array.from({ length: 50 }, () => [Math.random() * 15, Math.random() * 15]) as [
         number,
         number,
       ][],
@@ -332,7 +350,11 @@ const BrushExample: React.FC = () => {
           setTempRect((current) => {
             if (!current || current.width < MIN_SIZE || current.height < MIN_SIZE) return null
             const nextRect = { ...current, id: `brush-${Date.now()}` }
-            setBrushRects((prev) => [...prev, nextRect])
+            setBrushRects((prev) => {
+              // Remove existing rectangles with the same color
+              const filtered = prev.filter((rect) => rect.color !== nextRect.color)
+              return [...filtered, nextRect]
+            })
             setSelectedSeriesValues(getSeriesValuesInRect(nextRect))
             setShowSelectedValues(true)
             return null
@@ -460,7 +482,7 @@ const BrushExample: React.FC = () => {
           option={option}
           notMerge={true}
           onChartReady={handleChartReady}
-          style={{ height: 440, width: '100%' }}
+          style={{ height: 150, width: '100%' }}
         />
       </div>
       {showSelectedValues && (
@@ -490,6 +512,70 @@ const BrushExample: React.FC = () => {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+const BrushExample: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [brushRects, setBrushRects] = useState<BrushRect[]>([])
+  const [brushColor, setBrushColor] = useState<'blue' | 'red'>('blue')
+  const [selectedSeriesValues, setSelectedSeriesValues] = useState<[number, number][]>([])
+  const [showSelectedValues, setShowSelectedValues] = useState(false)
+
+  const showModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+  }
+
+  return (
+    <div className="card-section">
+      <div
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: 0 }}>Brush Example</h2>
+        <Button type="primary" size="large" onClick={showModal}>
+          Open as Modal
+        </Button>
+      </div>
+      <BrushExampleContent
+        brushRects={brushRects}
+        setBrushRects={setBrushRects}
+        brushColor={brushColor}
+        setBrushColor={setBrushColor}
+        selectedSeriesValues={selectedSeriesValues}
+        setSelectedSeriesValues={setSelectedSeriesValues}
+        showSelectedValues={showSelectedValues}
+        setShowSelectedValues={setShowSelectedValues}
+      />
+
+      <Modal
+        title="Brush Example - Modal View"
+        open={isModalOpen}
+        onCancel={handleModalClose}
+        footer={null}
+        width="90%"
+        style={{ top: 20 }}
+      >
+        <BrushExampleContent
+          brushRects={brushRects}
+          setBrushRects={setBrushRects}
+          brushColor={brushColor}
+          setBrushColor={setBrushColor}
+          selectedSeriesValues={selectedSeriesValues}
+          setSelectedSeriesValues={setSelectedSeriesValues}
+          showSelectedValues={showSelectedValues}
+          setShowSelectedValues={setShowSelectedValues}
+        />
+      </Modal>
     </div>
   )
 }
