@@ -1,3 +1,9 @@
+/**
+ *
+ * 부모화면과 팝업화면의 영역선택 기능의 기존 기능은 유지하면서 팝업을 오픈했들때 부모의 영역데이터를 팝업화면으로 동일하게 표시되고, 팝업화면이 닫을때 부모화면으로 동일하게 표시하고 싶어
+ * 부모화면이나 자식화면에서  같은 색깔의 영역은 하나이다.
+ *
+ */
 import type { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
