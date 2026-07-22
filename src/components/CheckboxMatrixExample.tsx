@@ -28,18 +28,38 @@ const CheckboxHeader = (props: any) => {
     // Update all cells in this column or row
     if (props.api) {
       props.api.forEachNode((node: any) => {
-        // Check if both row and column headers are checked
-        const rowHeaderChecked = node.data.rowLabel
-
         // For row label column, just set the value directly
         if (columnField === 'rowLabel') {
           node.setDataValue(columnField, newValue)
+
+          // When rowLabel is unchecked, uncheck all cells in this row
+          if (!newValue) {
+            const allColumns = props.api.getColumns()
+            if (allColumns) {
+              allColumns.forEach((col: any) => {
+                const colId = col.getColId()
+                if (colId !== 'rowLabel') {
+                  node.setDataValue(colId, false)
+                }
+              })
+            }
+          } else {
+            // When rowLabel is checked, check cells where column header is checked
+            const allColumns = props.api.getColumns()
+            if (allColumns) {
+              allColumns.forEach((col: any) => {
+                const colId = col.getColId()
+                if (colId !== 'rowLabel') {
+                  const colHeaderChecked = headerCheckboxStates[colId] || false
+                  node.setDataValue(colId, colHeaderChecked)
+                }
+              })
+            }
+          }
         } else {
-          // For regular columns, check intersection logic
-          // If both row and column headers are checked, check the cell
-          // Otherwise, uncheck it
-          const shouldCheck = rowHeaderChecked && newValue
-          node.setDataValue(columnField, shouldCheck)
+          // For regular columns, only check cells where rowLabel is also checked
+          const rowLabelChecked = node.data.rowLabel
+          node.setDataValue(columnField, rowLabelChecked && newValue)
         }
       })
     }
@@ -92,17 +112,49 @@ const CheckboxCellRenderer = (props: any) => {
     if (props.node && props.api) {
       props.node.setDataValue(colId, newValue)
 
-      // Update column header checkbox state
-      headerCheckboxStates[colId] = newValue
+      // Check if all cells in this column are deselected
+      let allColumnCellsDeselected = true
+      props.api.forEachNode((node: any) => {
+        if (node.data[colId]) {
+          allColumnCellsDeselected = false
+        }
+      })
 
-      // Force header component to re-render
-      const headerInstance = headerComponentInstances[colId]
-      if (headerInstance) {
-        headerInstance.forceUpdate((prev: number) => prev + 1)
+      // Only deselect column header if all cells in column are deselected
+      if (allColumnCellsDeselected) {
+        headerCheckboxStates[colId] = false
+        const headerInstance = headerComponentInstances[colId]
+        if (headerInstance) {
+          headerInstance.forceUpdate((prev: number) => prev + 1)
+        }
+      } else if (newValue) {
+        // If checking a cell, also check the column header
+        headerCheckboxStates[colId] = true
+        const headerInstance = headerComponentInstances[colId]
+        if (headerInstance) {
+          headerInstance.forceUpdate((prev: number) => prev + 1)
+        }
       }
 
-      // Update row label checkbox
-      props.node.setDataValue('rowLabel', newValue)
+      // Check if all cells in this row are deselected
+      let allRowCellsDeselected = true
+      const allColumns = props.api.getColumns()
+      if (allColumns) {
+        allColumns.forEach((col: any) => {
+          const colIdCheck = col.getColId()
+          if (colIdCheck !== 'rowLabel' && props.node.data[colIdCheck]) {
+            allRowCellsDeselected = false
+          }
+        })
+      }
+
+      // Only deselect rowLabel if all cells in row are deselected
+      if (allRowCellsDeselected) {
+        props.node.setDataValue('rowLabel', false)
+      } else if (newValue) {
+        // If checking a cell, also check the rowLabel
+        props.node.setDataValue('rowLabel', true)
+      }
     }
   }
 
