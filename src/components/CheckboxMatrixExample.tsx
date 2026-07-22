@@ -1,10 +1,10 @@
 import { Card, Checkbox } from 'antd'
 import { AgGridReact } from 'ag-grid-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { ColDef } from 'ag-grid-community'
 
-const TOTAL_ROWS = 300
-const TOTAL_COLUMNS = 200
+const TOTAL_ROWS = 10
+const TOTAL_COLUMNS = 10
 
 // Store header checkbox states
 const headerCheckboxStates: Record<string, boolean> = {}
@@ -18,6 +18,11 @@ const CheckboxHeader = (props: any) => {
 
   // Store this component instance
   headerComponentInstances[columnField] = { props, forceUpdate }
+
+  // Initialize header checkbox state if not already set
+  if (!(columnField in headerCheckboxStates)) {
+    headerCheckboxStates[columnField] = false
+  }
 
   const checked = headerCheckboxStates[columnField] || false
 
@@ -162,6 +167,140 @@ const CheckboxCellRenderer = (props: any) => {
 }
 
 function CheckboxMatrixExample() {
+  const [selectAllColumns, setSelectAllColumns] = useState(false)
+  const [selectAllRows, setSelectAllRows] = useState(false)
+  const [selectAll, setSelectAll] = useState(false)
+  const gridRef = useRef<any>(null)
+
+  const handleSelectAllColumns = (checked: boolean) => {
+    setSelectAllColumns(checked)
+
+    // Update all column headers and cells
+    if (gridRef.current && gridRef.current.api) {
+      const api = gridRef.current.api
+
+      // Check all column headers (including rowLabel)
+      Object.keys(headerCheckboxStates).forEach((key) => {
+        headerCheckboxStates[key] = checked
+      })
+
+      // Update all cells in all columns
+      api.forEachNode((node: any) => {
+        const allColumns = api.getColumns()
+        if (allColumns) {
+          allColumns.forEach((col: any) => {
+            const colId = col.getColId()
+            if (colId !== 'rowLabel') {
+              const rowLabelChecked = node.data.rowLabel
+              node.setDataValue(colId, rowLabelChecked && checked)
+            }
+          })
+        }
+      })
+
+      // Force all header components to re-render using stored instances
+      Object.keys(headerCheckboxStates).forEach((key) => {
+        const headerInstance = headerComponentInstances[key]
+        if (headerInstance && headerInstance.forceUpdate) {
+          headerInstance.forceUpdate((prev: number) => prev + 1)
+        }
+      })
+
+      // Refresh the grid to update cell renderers
+      api.refreshCells()
+    }
+  }
+
+  const handleSelectAllRows = (checked: boolean) => {
+    setSelectAllRows(checked)
+
+    // Update all row labels and cells
+    if (gridRef.current && gridRef.current.api) {
+      const api = gridRef.current.api
+
+      // Check all row labels
+      api.forEachNode((node: any) => {
+        node.setDataValue('rowLabel', checked)
+
+        // When rowLabel is checked, check cells where column header is checked
+        if (checked) {
+          const allColumns = api.getColumns()
+          if (allColumns) {
+            allColumns.forEach((col: any) => {
+              const colId = col.getColId()
+              if (colId !== 'rowLabel') {
+                const colHeaderChecked = headerCheckboxStates[colId] || false
+                node.setDataValue(colId, colHeaderChecked)
+              }
+            })
+          }
+        } else {
+          // When rowLabel is unchecked, uncheck all cells in this row
+          const allColumns = api.getColumns()
+          if (allColumns) {
+            allColumns.forEach((col: any) => {
+              const colId = col.getColId()
+              if (colId !== 'rowLabel') {
+                node.setDataValue(colId, false)
+              }
+            })
+          }
+        }
+      })
+
+      // Refresh the grid to update cell renderers
+      api.refreshCells()
+    }
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectAll(checked)
+    setSelectAllColumns(checked)
+    setSelectAllRows(checked)
+
+    // Update all column headers and cells
+    if (gridRef.current && gridRef.current.api) {
+      const api = gridRef.current.api
+
+      // Check all column headers
+      Object.keys(headerCheckboxStates).forEach((key) => {
+        headerCheckboxStates[key] = checked
+      })
+
+      // Update all cells
+      api.forEachNode((node: any) => {
+        // Update row label
+        node.setDataValue('rowLabel', checked)
+
+        // Update all cells
+        const allColumns = api.getColumns()
+        if (allColumns) {
+          allColumns.forEach((col: any) => {
+            const colId = col.getColId()
+            if (colId !== 'rowLabel') {
+              node.setDataValue(colId, checked)
+            }
+          })
+        }
+      })
+
+      // Force all header components to re-render using stored instances
+      Object.keys(headerCheckboxStates).forEach((key) => {
+        const headerInstance = headerComponentInstances[key]
+        if (headerInstance && headerInstance.forceUpdate) {
+          headerInstance.forceUpdate((prev: number) => prev + 1)
+        }
+      })
+
+      // Refresh the grid to update cell renderers
+      api.refreshCells()
+    }
+  }
+
+  const handleGridReady = (params: any) => {
+    gridRef.current = { api: params.api }
+  }
+
   const columnDefs = useMemo<ColDef[]>(() => {
     const checkboxCols: ColDef[] = Array.from({ length: TOTAL_COLUMNS }, (_, index) => ({
       field: `col_${index + 1}`,
@@ -217,8 +356,23 @@ function CheckboxMatrixExample() {
   console.log('rowData', rowData)
   return (
     <Card title="ag-Grid Checkbox Matrix Example" className="card-section">
+      <div style={{ marginBottom: 16, display: 'flex', gap: 16, alignItems: 'center' }}>
+        <Checkbox
+          checked={selectAllColumns}
+          onChange={(e) => handleSelectAllColumns(e.target.checked)}
+        >
+          Select All Column Headers
+        </Checkbox>
+        <Checkbox checked={selectAllRows} onChange={(e) => handleSelectAllRows(e.target.checked)}>
+          Select All Row Headers
+        </Checkbox>
+        <Checkbox checked={selectAll} onChange={(e) => handleSelectAll(e.target.checked)}>
+          Select All
+        </Checkbox>
+      </div>
       <div className="ag-theme-quartz" style={{ width: '100%', height: '500px' }}>
         <AgGridReact
+          ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={{
@@ -232,6 +386,7 @@ function CheckboxMatrixExample() {
           rowBuffer={0}
           suppressAnimationFrame={true}
           headerHeight={60}
+          onGridReady={handleGridReady}
         />
       </div>
     </Card>
