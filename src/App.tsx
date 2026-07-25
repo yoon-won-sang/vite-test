@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { Form, Tabs, message, Button, Tag } from 'antd'
+import { Form, Tabs, message, Tag } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnsType } from 'antd/es/table'
 import type { GridApi } from 'ag-grid-community'
@@ -11,7 +11,6 @@ import {
   FormOutlined,
   BgColorsOutlined,
   AppstoreAddOutlined,
-  LogoutOutlined,
   CheckSquareOutlined,
   SettingOutlined,
 } from '@ant-design/icons'
@@ -23,16 +22,14 @@ import CheckboxMatrixExample from './components/CheckboxMatrixExample'
 import ColumnHandlingSection from './components/ColumnHandlingSection'
 import Charts from './components/Charts'
 import BrushExample from './components/BrushExample'
+import GroupedHeaderGrid from './components/GroupedHeaderGrid'
 import Working from './components/Working.tsx'
-import LoginForm from './components/LoginForm'
 import TrigonometricChart from './components/TrigonometricChart'
 import SimpleScatterChart from './components/SimpleScatterChart'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user, setUser] = useState<{ username: string } | null>(null)
   const [localRows, setLocalRows] = useState<Employee[]>([])
   const [searchText, setSearchText] = useState('')
   const [gridApi, setGridApi] = useState<GridApi | null>(null)
@@ -53,7 +50,6 @@ function App() {
       }))
     },
     staleTime: 1000 * 60 * 5,
-    enabled: isLoggedIn,
   })
 
   const fetchedRows = queryResult.data ?? []
@@ -64,17 +60,6 @@ function App() {
       message.error('Failed to load employee data from jsonplaceholder.')
     }
   }, [queryResult.isError])
-
-  const handleLogin = (values: { username: string }) => {
-    setIsLoggedIn(true)
-    setUser({ username: values.username })
-  }
-
-  const handleLogout = () => {
-    setIsLoggedIn(false)
-    setUser(null)
-    message.info('Logged out successfully')
-  }
 
   const columnDefs = [
     { field: 'id', headerName: 'ID', width: 80, sortable: true, filter: true },
@@ -188,6 +173,12 @@ function App() {
 
   const tabs = [
     {
+      key: 'grouped-header',
+      label: 'Grouped Header',
+      icon: <AppstoreAddOutlined />,
+      children: <GroupedHeaderGrid rowData={rowData} />,
+    },
+    {
       key: 'table',
       label: 'AntD Table',
       icon: <TableOutlined />,
@@ -274,22 +265,15 @@ function App() {
     },
   ]
 
-  if (!isLoggedIn) {
-    return <LoginForm onLogin={handleLogin} />
-  }
-
   return (
     <div className="app-container">
-      <Button className="logout-btn" icon={<LogoutOutlined />} onClick={handleLogout} danger>
-        Logout
-      </Button>
       <div className="header">
         <h1>🚀 Vite + React + ag-Grid + Ant Design</h1>
-        <p>Welcome, {user?.username}! Employee Management System Example</p>
+        <p>Employee Management System Example</p>
       </div>
 
       <div className="content">
-        <Tabs defaultActiveKey="table" items={tabs} />
+        <Tabs defaultActiveKey="grouped-header" items={tabs} />
       </div>
 
       <footer className="footer">

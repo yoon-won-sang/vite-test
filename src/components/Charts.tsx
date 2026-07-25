@@ -1,4 +1,4 @@
-import React, { Suspense, useRef } from 'react'
+import React, { Suspense, useRef, useState } from 'react'
 
 const ReactECharts = React.lazy(() => import('echarts-for-react'))
 
@@ -8,6 +8,10 @@ const Charts: React.FC = () => {
     tooltip: {},
     xAxis: { type: 'category', data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'] },
     yAxis: { type: 'value' },
+    dataZoom: [
+      { type: 'inside', start: 0, end: 100 },
+      { type: 'slider', start: 0, end: 100, height: 20, bottom: 10 },
+    ],
     series: [
       {
         name: 'Sales',
@@ -23,6 +27,10 @@ const Charts: React.FC = () => {
     tooltip: { trigger: 'axis' },
     xAxis: { type: 'category', data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
     yAxis: { type: 'value' },
+    dataZoom: [
+      { type: 'inside', start: 0, end: 100 },
+      { type: 'slider', start: 0, end: 100, height: 20, bottom: 10 },
+    ],
     series: [
       {
         name: 'Visitors',
@@ -58,6 +66,19 @@ const Charts: React.FC = () => {
     tooltip: { trigger: 'item' },
     xAxis: {},
     yAxis: {},
+    toolbox: {
+      feature: {
+        dataZoom: {
+          yAxisIndex: 'none',
+        },
+        brush: {
+          type: ['rect', 'keep', 'clear'],
+        },
+      },
+    },
+    dataZoom: [
+      { type: 'inside', start: 0, end: 100 },
+    ],
     series: [
       {
         symbolSize: 20,
@@ -88,41 +109,40 @@ const Charts: React.FC = () => {
         type: 'scatter',
       },
     ],
-    brush: {
-      brushType: 'rect',
-      toolbox: ['rect', 'keep', 'clear'],
-    },
   }
 
   const chartRef = useRef(null)
+  const [zoomActive, setZoomActive] = useState(false)
 
-  const handleUpdateGood = () => {
+  const toggleZoom = () => {
     if (chartRef.current) {
-      console.log('🚀 ~ handleUpdateGood ~ chartRef.current:', chartRef.current)
       // @ts-ignore
-      // chartRef.current.getInstance().setOption({
-      //   brush: {
-      //     brushType: 'rect',
-      //     BrushStyle: {
-      //       color: 'rgba(0, 255, 0, 0.3)',
-      //       borderColor: 'green',
-      //       borderWidth: 2,
-      //     },
-      //   },
-      // })
+      const chart = chartRef.current.getEchartsInstance()
+      if (zoomActive) {
+        chart.dispatchAction({ type: 'takeGlobalCursor', key: 'dataZoomSelect', dataZoomSelectActive: false })
+      } else {
+        chart.dispatchAction({ type: 'takeGlobalCursor', key: 'dataZoomSelect', dataZoomSelectActive: true })
+      }
+      setZoomActive(!zoomActive)
     }
   }
-  const handleUpdateBad = () => { }
+  const resetZoom = () => {
+    if (chartRef.current) {
+      // @ts-ignore
+      const chart = chartRef.current.getEchartsInstance()
+      chart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
+    }
+  }
   return (
     <div className="card-section">
       <h2 style={{ marginTop: 0 }}>Charts (ECharts)</h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
         <Suspense fallback={<div>Loading charts…</div>}>
-          <button onClick={handleUpdateGood} style={{ marginBottom: '10px' }}>
-            Good
+          <button onClick={toggleZoom} style={{ marginBottom: '10px', background: zoomActive ? '#1677ff' : undefined, color: zoomActive ? '#fff' : undefined }}>
+            {zoomActive ? 'Zoom ON' : 'Zoom OFF'}
           </button>
-          <button onClick={handleUpdateBad} style={{ marginBottom: '10px' }}>
-            Bad
+          <button onClick={resetZoom} style={{ marginBottom: '10px' }}>
+            Reset Zoom
           </button>
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
             <ReactECharts ref={chartRef} option={scatterOption} style={{ height: 380 }} />

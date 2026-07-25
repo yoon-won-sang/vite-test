@@ -170,6 +170,7 @@ function CheckboxMatrixExample() {
   const [selectAllColumns, setSelectAllColumns] = useState(false)
   const [selectAllRows, setSelectAllRows] = useState(false)
   const [selectAll, setSelectAll] = useState(false)
+  const [selectArea, setSelectArea] = useState(false)
   const gridRef = useRef<any>(null)
 
   const handleSelectAllColumns = (checked: boolean) => {
@@ -253,6 +254,59 @@ function CheckboxMatrixExample() {
     }
   }
 
+  const test = (api: any, selectedColIds: Set<string>, selectedRowIndices: Set<number>) => {
+    // Check column headers
+    selectedColIds.forEach((colId) => {
+      if (colId !== 'rowLabel') {
+        headerCheckboxStates[colId] = true
+      }
+    })
+    // Check row headers and corresponding cells
+    api.forEachNode((node: any) => {
+      if (node.rowIndex !== null && selectedRowIndices.has(node.rowIndex)) {
+        node.setDataValue('rowLabel', true)
+        selectedColIds.forEach((colId) => {
+          if (colId !== 'rowLabel') {
+            node.setDataValue(colId, true)
+          }
+        })
+      }
+    })
+    // Force re-render of all header components
+    Object.keys(headerCheckboxStates).forEach((key) => {
+      const headerInstance = headerComponentInstances[key]
+      if (headerInstance && headerInstance.forceUpdate) {
+        headerInstance.forceUpdate((prev: number) => prev + 1)
+      }
+    })
+    api.refreshCells()
+  }
+
+  const handleSelectAreaHeaders = () => {
+    if (gridRef.current && gridRef.current.api) {
+      const api = gridRef.current.api
+      const cellRanges = api.getCellRanges()
+      if (!cellRanges || cellRanges.length === 0) return
+      const selectedColIds = new Set<string>()
+      const selectedRowIndices = new Set<number>()
+      cellRanges.forEach((range: any) => {
+        const columns = range.columns
+        const startRow = range.startRow?.rowIndex ?? 0
+        const endRow = range.endRow?.rowIndex ?? 0
+        columns.forEach((col: any) => {
+          selectedColIds.add(col.getColId())
+        })
+        const minRow = Math.min(startRow, endRow)
+        const maxRow = Math.max(startRow, endRow)
+        for (let i = minRow; i <= maxRow; i++) {
+          selectedRowIndices.add(i)
+        }
+      })
+      test(api, selectedColIds, selectedRowIndices)
+      setSelectArea(true)
+      setTimeout(() => setSelectArea(false), 2000)
+    }
+  }
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked)
     setSelectAllColumns(checked)
@@ -346,7 +400,7 @@ function CheckboxMatrixExample() {
         }
 
         for (let colIndex = 0; colIndex < TOTAL_COLUMNS; colIndex += 1) {
-          row[`col_${colIndex + 1}`] = false
+          row[`col_${colIndex + 1}`] = colIndex === 2 || colIndex === 3 || colIndex === 4 // Default to true for even columns, false for odd columns
         }
 
         return row
@@ -356,7 +410,15 @@ function CheckboxMatrixExample() {
   console.log('rowData', rowData)
   return (
     <Card title="ag-Grid Checkbox Matrix Example" className="card-section">
-      <div style={{ marginBottom: 16, display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          gap: 16,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
         <Checkbox
           checked={selectAllColumns}
           onChange={(e) => handleSelectAllColumns(e.target.checked)}
@@ -369,6 +431,21 @@ function CheckboxMatrixExample() {
         <Checkbox checked={selectAll} onChange={(e) => handleSelectAll(e.target.checked)}>
           Select All
         </Checkbox>
+        <button
+          onClick={handleSelectAreaHeaders}
+          style={{
+            padding: '4px 12px',
+            backgroundColor: selectArea ? '#52c41a' : '#1677ff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+            fontSize: 14,
+            transition: 'background-color 0.3s',
+          }}
+        >
+          {selectArea ? '✅ Checked!' : 'Select Current Area Headers'}
+        </button>
       </div>
       <div className="ag-theme-quartz" style={{ width: '100%', height: '500px' }}>
         <AgGridReact
@@ -381,8 +458,7 @@ function CheckboxMatrixExample() {
             resizable: false,
             editable: true,
           }}
-          // domLayout="autoHeight"
-          // rowSelection="multiple"
+          enableRangeSelection={true}
           rowBuffer={0}
           suppressAnimationFrame={true}
           headerHeight={60}

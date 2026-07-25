@@ -32,11 +32,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           <Form.Item
             name="username"
             rules={[{ required: true, message: 'Please input your Username!' }]}
+            initialValue={'apple'}
           >
             <Input prefix={<UserOutlined />} placeholder="Username" size="large" />
           </Form.Item>
           <Form.Item
             name="password"
+            initialValue={'appleApple'}
             rules={[{ required: true, message: 'Please input your Password!' }]}
           >
             <Input.Password prefix={<LockOutlined />} placeholder="Password" size="large" />

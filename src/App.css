@@ -1,8 +1,9 @@
 .app-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #FFF1F8 0%, #F0F7FF 50%, #F2FFF2 100%);
+  background: linear-gradient(135deg, #fff1f8 0%, #f0f7ff 50%, #f2fff2 100%);
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
     'Helvetica Neue', sans-serif;
   color: #333;
 }
@@ -44,7 +45,7 @@
 }
 
 .card-section :global(.ant-card-head) {
-  border-bottom: 2px solid #D9B3FF;
+  border-bottom: 2px solid #d9b3ff;
 }
 
 .ag-grid-wrapper {
@@ -80,54 +81,68 @@
 }
 
 /* Pastel Tab Colors */
+.content :global(.ant-tabs-nav) {
+  margin-bottom: 16px;
+}
+
+.content :global(.ant-tabs-nav .ant-tabs-nav-wrap) {
+  flex-wrap: wrap;
+}
+
+.content :global(.ant-tabs-nav .ant-tabs-nav-list) {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
 .content :global(.ant-tabs-tab) {
   border-radius: 8px 8px 0 0;
   transition: all 0.3s ease;
   font-weight: 500;
+  margin: 2px 0 !important;
 }
 
 /* Tab 1: Pastel Pink */
 .content :global(.ant-tabs-tab:nth-child(1)) {
-  background-color: #FFB3D9;
-  color: #8B4A6D;
+  background-color: #ffb3d9;
+  color: #8b4a6d;
 }
 
 .content :global(.ant-tabs-tab:nth-child(1).ant-tabs-tab-active) {
-  background-color: #FF85C0 !important;
-  color: #6B2A4D !important;
+  background-color: #ff85c0 !important;
+  color: #6b2a4d !important;
 }
 
 /* Tab 2: Pastel Blue */
 .content :global(.ant-tabs-tab:nth-child(2)) {
-  background-color: #B3D9FF;
-  color: #4A7BA7;
+  background-color: #b3d9ff;
+  color: #4a7ba7;
 }
 
 .content :global(.ant-tabs-tab:nth-child(2).ant-tabs-tab-active) {
-  background-color: #85CBFF !important;
-  color: #2A5B87 !important;
+  background-color: #85cbff !important;
+  color: #2a5b87 !important;
 }
 
 /* Tab 3: Pastel Green */
 .content :global(.ant-tabs-tab:nth-child(3)) {
-  background-color: #B3FFB3;
-  color: #4A8B4A;
+  background-color: #b3ffb3;
+  color: #4a8b4a;
 }
 
 .content :global(.ant-tabs-tab:nth-child(3).ant-tabs-tab-active) {
-  background-color: #85FF85 !important;
-  color: #2A6B2A !important;
+  background-color: #85ff85 !important;
+  color: #2a6b2a !important;
 }
 
 /* Tab 4: Pastel Purple */
 .content :global(.ant-tabs-tab:nth-child(4)) {
-  background-color: #E6B3FF;
-  color: #8B4AAE;
+  background-color: #e6b3ff;
+  color: #8b4aae;
 }
 
 .content :global(.ant-tabs-tab:nth-child(4).ant-tabs-tab-active) {
-  background-color: #D985FF !important;
-  color: #6B2A8E !important;
+  background-color: #d985ff !important;
+  color: #6b2a8e !important;
 }
 
 @keyframes slideIn {
@@ -165,7 +180,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #FFF1F8 0%, #F0F7FF 50%, #F2FFF2 100%);
+  background: linear-gradient(135deg, #fff1f8 0%, #f0f7ff 50%, #f2fff2 100%);
 }
 
 .login-card {
