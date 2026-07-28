@@ -8,12 +8,11 @@ const { Title, Text } = Typography
 const SimpleScatterChart: React.FC = () => {
   const [dataCount, setDataCount] = useState(10000) // 1000 단위, 최대 50000
 
+  //한글을 쓰고
   // Generate scatter data with time on X-axis and decimal coordinates on Y-axis
   const generateData = useMemo(() => {
     return Array.from({ length: dataCount }, (_, i) => {
       const hours = (i / dataCount) * 24 // 0 to 24 hours
-      const minutes = Math.floor((hours % 1) * 60)
-      const hour = Math.floor(hours)
 
       // Generate random decimal Y coordinate
       const y = Math.random() * 100

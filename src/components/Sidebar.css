@@ -1,0 +1,127 @@
+.sidebar {
+  height: 100vh;
+  background: #fff;
+  border-right: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  position: relative;
+  z-index: 100;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar.collapsed {
+  width: 64px;
+}
+
+.sidebar:not(.collapsed) {
+  width: 280px;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 56px;
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.logo {
+  font-size: 20px;
+}
+
+.collapse-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapse-button:hover {
+  background: #f5f5f5;
+  color: #1890ff;
+}
+
+.sidebar :global(.ant-menu) {
+  border: none;
+  padding: 8px 0;
+}
+
+.sidebar :global(.ant-menu-inline) {
+  padding: 0;
+}
+
+.sidebar :global(.ant-menu-item) {
+  margin: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.sidebar:not(.collapsed) :global(.ant-menu-item) {
+  width: calc(100% - 16px);
+}
+
+.sidebar :global(.ant-menu-item-selected) {
+  background: #e6f7ff !important;
+  border-right: 3px solid #1890ff;
+}
+
+.sidebar :global(.ant-menu-item-selected) :global(.ant-menu-item-icon),
+.sidebar :global(.ant-menu-item-selected) :global(.ant-menu-title-content) {
+  color: #1890ff;
+}
+
+.sidebar :global(.ant-menu-item:hover) {
+  background: #f5f5f5;
+}
+
+.sidebar :global(.ant-menu-item-icon) {
+  min-width: 16px;
+}
+
+.sidebar.collapsed :global(.ant-menu-inline) {
+  padding: 0;
+}
+
+.sidebar.collapsed :global(.ant-menu-item) {
+  margin: 4px 8px;
+  text-align: center;
+  width: auto;
+}
+
+.sidebar.collapsed :global(.ant-menu-item-icon) {
+  margin: 0;
+}
+
+.sidebar.collapsed :global(.ant-menu-title-content) {
+  display: none;
+}
+
+.sidebar :global(.ant-menu-submenu) {
+  border-radius: 6px;
+  margin: 2px 8px;
+}
+
+.sidebar :global(.ant-menu-submenu-title) {
+  padding-left: 12px !important;
+}
+
+.sidebar.collapsed :global(.ant-menu-submenu-title) {
+  padding-left: 0 !important;
+}

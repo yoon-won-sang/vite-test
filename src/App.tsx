@@ -26,10 +26,14 @@ import GroupedHeaderGrid from './components/GroupedHeaderGrid'
 import Working from './components/Working.tsx'
 import TrigonometricChart from './components/TrigonometricChart'
 import SimpleScatterChart from './components/SimpleScatterChart'
+import WebWorkerExample from './components/WebWorkerExample'
+import MergeExample from './components/MergeExample'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
+import Sidebar from './components/Sidebar'
 
 function App() {
+  const [collapsed, setCollapsed] = useState(false)
   const [localRows, setLocalRows] = useState<Employee[]>([])
   const [searchText, setSearchText] = useState('')
   const [gridApi, setGridApi] = useState<GridApi | null>(null)
@@ -51,7 +55,6 @@ function App() {
     },
     staleTime: 1000 * 60 * 5,
   })
-
   const fetchedRows = queryResult.data ?? []
   const rowData = [...fetchedRows, ...localRows]
 
@@ -174,13 +177,13 @@ function App() {
   const tabs = [
     {
       key: 'grouped-header',
-      label: 'Grouped Header',
+      label: '그룹 헤더',
       icon: <AppstoreAddOutlined />,
       children: <GroupedHeaderGrid rowData={rowData} />,
     },
     {
       key: 'table',
-      label: 'AntD Table',
+      label: 'AntD 테이블',
       icon: <TableOutlined />,
       children: (
         <EmployeeTable
@@ -196,13 +199,13 @@ function App() {
     },
     {
       key: 'form',
-      label: 'Employee Form',
+      label: '직원 등록',
       icon: <FormOutlined />,
       children: <EmployeeForm form={form} handleFormSubmit={handleFormSubmit} />,
     },
     {
       key: 'grid',
-      label: 'ag-Grid Infinite Scroll',
+      label: 'ag-Grid 무한 스크롤',
       icon: <BgColorsOutlined />,
       children: (
         <InfiniteGridSection
@@ -217,71 +220,104 @@ function App() {
     },
     {
       key: 'checkbox-grid',
-      label: 'Checkbox Selection',
+      label: '체크박스 선택',
       icon: <CheckSquareOutlined />,
       children: <CheckboxGridSection rowData={rowData} />,
     },
     {
       key: 'empty',
-      label: 'Charts',
+      label: '차트',
       icon: <AppstoreAddOutlined />,
       children: <Charts />,
     },
     {
       key: 'brush',
-      label: 'Brush Example',
+      label: '브러시 예제',
       icon: <AppstoreAddOutlined />,
       children: <BrushExample />,
     },
     {
       key: 'trigonometric',
-      label: 'Trigonometric Chart',
+      label: '삼각함수 차트',
       icon: <AppstoreAddOutlined />,
       children: <TrigonometricChart />,
     },
     {
       key: 'simple-scatter',
-      label: 'Simple Scatter Chart',
+      label: '단순 산점도',
       icon: <AppstoreAddOutlined />,
       children: <SimpleScatterChart />,
     },
     {
       key: 'example',
-      label: 'Working',
+      label: '작업 중',
       icon: <AppstoreAddOutlined />,
       children: <Working rowData={rowData} />,
     },
     {
       key: 'checkbox-matrix',
-      label: 'Checkbox Matrix',
+      label: '체크박스 매트릭스',
       icon: <CheckSquareOutlined />,
       children: <CheckboxMatrixExample />,
     },
     {
       key: 'column-handling',
-      label: 'Column Handling',
+      label: '컬럼 처리',
       icon: <SettingOutlined />,
       children: <ColumnHandlingSection rowData={rowData} />,
     },
+    {
+      key: 'web-worker',
+      label: '웹 워커',
+      icon: <AppstoreAddOutlined />,
+      children: <WebWorkerExample />,
+    },
+    {
+      key: 'merge-example',
+      label: '병합예제',
+      icon: <AppstoreAddOutlined />,
+      children: <MergeExample />,
+    },
   ]
 
+  const [activeTab, setActiveTab] = useState('grouped-header')
+
+  const handleNavigate = (key: string) => {
+    setActiveTab(key)
+  }
   return (
     <div className="app-container">
-      <div className="header">
-        <h1>🚀 Vite + React + ag-Grid + Ant Design</h1>
-        <p>Employee Management System Example</p>
-      </div>
+      <div className="layout-wrapper">
+        <Sidebar
+          activeKey={activeTab}
+          onNavigate={handleNavigate}
+          collapsed={collapsed}
+          onCollapse={setCollapsed}
+        />
 
-      <div className="content">
-        <Tabs defaultActiveKey="grouped-header" items={tabs} />
-      </div>
+        <div className={`main-content ${collapsed ? 'expanded-content' : ''}`}>
+          <div className="header">
+            <h1>🚀 Vite + React + ag-Grid + Ant Design</h1>
+            <p>Employee Management System Example</p>
+          </div>
 
-      <footer className="footer">
-        <p>
-          Built with <strong>Vite</strong> • <strong>React</strong> • <strong>ag-Grid</strong> •{' '}
-          <strong>Ant Design</strong>
-        </p>
-      </footer>
+          <div className="content">
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              defaultActiveKey="grouped-header"
+              items={tabs}
+            />
+          </div>
+
+          <footer className="footer">
+            <p>
+              Built with <strong>Vite</strong> • <strong>React</strong> • <strong>ag-Grid</strong> •{' '}
+              <strong>Ant Design</strong>
+            </p>
+          </footer>
+        </div>
+      </div>
     </div>
   )
 }
