@@ -1,4 +1,4 @@
-import React, { Suspense, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import axios from 'axios'
 const ReactECharts = React.lazy(() => import('echarts-for-react'))
 
@@ -40,7 +40,9 @@ const SimpleLineChart: React.FC = () => {
   const [selectedSeries, setSelectedSeries] = useState<string | null>(null)
   const [selectedData, setSelectedData] = useState<number[] | null>(null)
   const [loading, setLoading] = useState(false)
-  const chartRef = useRef(null)
+  // onChartReady 로 확보한 최종(영구) ECharts 인스턴스를 보관
+  // (echarts-for-react 는 초기화 시 임시 인스턴스를 폐기 후 재생성하므로 onChartReady 를 사용해야 안전)
+  const chartInstanceRef = useRef<any>(null)
 
   // 선택 상자에서 시리즈를 선택했을 때만 axios 호출
   const handleSelectSeries = async (name: string) => {
@@ -64,8 +66,8 @@ const SimpleLineChart: React.FC = () => {
     }
   }
 
-  // 차트 시리즈 구성: Sales(항상) + 선택된 시리즈
-  const buildSeries = () => {
+  // 차트 옵션 구성: Sales(항상) + 선택된 시리즈
+  const buildOption = () => {
     const series = [
       {
         name: BASE_SERIES,
@@ -84,16 +86,31 @@ const SimpleLineChart: React.FC = () => {
       })
     }
 
-    return series
+    return {
+      title: { text: 'Simple Line Chart', left: 'left' },
+      tooltip: { trigger: 'axis' },
+      legend: { data: series.map((s) => s.name) },
+      xAxis: { type: 'category', data: X_AXIS_DATA },
+      yAxis: { type: 'value' },
+      series,
+    }
   }
 
-  const lineOption = {
-    title: { text: 'Simple Line Chart', left: 'left' },
-    tooltip: { trigger: 'axis' },
-    legend: { data: buildSeries().map((s) => s.name) },
-    xAxis: { type: 'category', data: X_AXIS_DATA },
-    yAxis: { type: 'value' },
-    series: buildSeries(),
+  // 선택된 시리즈/데이터가 바뀔 때마다 차트 인스턴스에 setOption 적용
+  const lineOption = useMemo(() => buildOption(), [selectedSeries, selectedData])
+
+  useEffect(() => {
+    const chart = chartInstanceRef.current
+    if (chart) {
+      // notMerge=true 로 이전 옵션을 대체 (잔상/중복 시리즈 방지)
+      chart.setOption(lineOption, true)
+    }
+  }, [lineOption])
+
+  // echarts-for-react 가 최종 인스턴스를 생성한 직후 호출됨 (이 시점부터 인스턴스가 안정적)
+  const handleChartReady = (instance: any) => {
+    chartInstanceRef.current = instance
+    instance.setOption(lineOption, true)
   }
 
   return (
@@ -117,11 +134,11 @@ const SimpleLineChart: React.FC = () => {
       </div>
 
       <Suspense fallback={<div>Loading chart...</div>}>
-        <div ref={chartRef} style={{ width: '100%', height: 400, position: 'relative' }}>
-          {/* 차트는 항상 유지 (깜박임 방지) */}
-          <ReactECharts option={lineOption} style={{ height: 400 }} />
+        <div style={{ width: '100%', height: 400, position: 'relative' }}>
+          {/* 차트는 항상 유지 (깜박임 방지) - option 은 onChartReady + setOption 으로 주입 */}
+          <ReactECharts option={{}} onChartReady={handleChartReady} style={{ height: 400 }} />
           {/* 로딩 중일 때만 오버레이 표시 */}
-          {loading && <div style={styles.loadingOverlay}>{selectedSeries} 데이터 로딩 중...</div>}
+          {/* {loading && <div style={styles.loadingOverlay}>{selectedSeries} 데이터 로딩 중...</div>} */}
         </div>
       </Suspense>
     </div>
