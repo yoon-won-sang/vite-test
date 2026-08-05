@@ -85,6 +85,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
       icon: <UnorderedListOutlined />,
       label: '병합예제',
     },
+    {
+      key: 'simple-line-example',
+      icon: <UnorderedListOutlined />,
+      label: '동적선차트',
+    },
   ]
 
   const toggleCollapse = () => {

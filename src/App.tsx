@@ -28,6 +28,7 @@ import TrigonometricChart from './components/TrigonometricChart'
 import SimpleScatterChart from './components/SimpleScatterChart'
 import WebWorkerExample from './components/WebWorkerExample'
 import MergeExample from './components/MergeExample'
+import SimpleLineChart from './components/SimpleLineChart'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -278,6 +279,13 @@ function App() {
       icon: <AppstoreAddOutlined />,
       children: <MergeExample />,
     },
+    {
+      key: 'simple-line-example',
+      label: '라인차트',
+      icon: <AppstoreAddOutlined />,
+      children: <SimpleLineChart />,
+    },
+
   ]
 
   const [activeTab, setActiveTab] = useState('grouped-header')
