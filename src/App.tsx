@@ -29,6 +29,7 @@ import SimpleScatterChart from './components/SimpleScatterChart'
 import WebWorkerExample from './components/WebWorkerExample'
 import MergeExample from './components/MergeExample'
 import SimpleLineChart from './components/SimpleLineChart'
+import ChartTabExample from './components/ChartTabExample'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -285,7 +286,12 @@ function App() {
       icon: <AppstoreAddOutlined />,
       children: <SimpleLineChart />,
     },
-
+    {
+      key: 'chart-tab-example',
+      label: '탭 안 차트',
+      icon: <AppstoreAddOutlined />,
+      children: <ChartTabExample />,
+    },
   ]
 
   const [activeTab, setActiveTab] = useState('grouped-header')

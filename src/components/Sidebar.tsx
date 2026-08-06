@@ -90,6 +90,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
       icon: <UnorderedListOutlined />,
       label: '동적선차트',
     },
+    {
+      key: 'chart-tab-example',
+      icon: <UnorderedListOutlined />,
+      label: '탭 안 차트',
+    },
   ]
 
   const toggleCollapse = () => {
