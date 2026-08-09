@@ -13,6 +13,7 @@ import {
   AppstoreAddOutlined,
   CheckSquareOutlined,
   SettingOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons'
 import EmployeeTable from './components/EmployeeTable'
 import EmployeeForm from './components/EmployeeForm'
@@ -30,6 +31,9 @@ import WebWorkerExample from './components/WebWorkerExample'
 import MergeExample from './components/MergeExample'
 import SimpleLineChart from './components/SimpleLineChart'
 import ChartTabExample from './components/ChartTabExample'
+import PopupBarChart from './components/PopupBarChart'
+import StringOperations from './components/StringOperations'
+import ZustandExample from './components/ZustandExample'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -291,6 +295,24 @@ function App() {
       label: '탭 안 차트',
       icon: <AppstoreAddOutlined />,
       children: <ChartTabExample />,
+    },
+    {
+      key: 'popup-bar-chart',
+      label: '막대차트 팝업',
+      icon: <BarChartOutlined />,
+      children: <PopupBarChart />,
+    },
+    {
+      key: 'string-operations',
+      label: '문자열 연산',
+      icon: <AppstoreAddOutlined />,
+      children: <StringOperations />,
+    },
+    {
+      key: 'zustand-example',
+      label: 'zustand 예제',
+      icon: <AppstoreAddOutlined />,
+      children: <ZustandExample />,
     },
   ]
 

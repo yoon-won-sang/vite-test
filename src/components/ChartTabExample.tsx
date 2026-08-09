@@ -1,59 +1,81 @@
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 import { Card, Tabs, Typography } from 'antd'
 import SimpleLineChart from './SimpleLineChart'
-import MyChart from './차트높이리사지징스니펫'
+import MyChart from './MyChart'
+import { useTabStore, RESIZE_UUID, ChartTab } from '../stores/tabStore'
 
 const { Title, Paragraph } = Typography
 
 /**
- * antd Tabs 를 이용한 차트 탭 예제
- * - 첫 번째 탭: SimpleLineChart
- * - 두 번째 탭: MyChart (탭 변경 시점에 리사이즈하는 차트)
+ * antd Tabs 를 이용한 차트 탭 예제 (zustand 기반 리팩터링)
+ * - 탭 목록/활성 탭/refetch 의도는 전부 `useTabStore`(zustand)가 관리한다.
+ * - 부모는 이제 "껍데기" 만 담당한다:
+ *   ① Tabs 를 store 의 activeUuid 에 맞춰 렌더링
+ *   ② onChange(탭 클릭) → store.setActiveByTabClick (이동만, refetch 의도 없음)
+ *   ③ 탭 A(SimpleLineChart) 버튼 → store.navigateWithRefetch (이동 + refetch 의도)
+ * - 각 MyChart(B) 는 스스로 store 를 구독해 "자기가 대상+활성이면 refetch" 한다.
+ *   → 부모의 chartRefs Map / refetchAndOpen 이 더 이상 필요 없다.
  *
- * ⚠️ echarts-for-react 기반 차트는 `display:none`(숨겨진 탭)에서 크기가 0으로 초기화될 수
- * 있으므로, 탭 안에 차트를 넣을 때는 반드시 리사이즈 처리가 필요합니다.
- *
- * 💡 두 번째 탭(MyChart)은 antd Tabs 의 onChange(탭 변경 시점)에서 resizeSignal 을
- *    증가시켜, 그 시점에 최종 크기로 리사이즈 하도록 합니다.
+ * ⚠️ echarts 기반 차트는 숨겨진 탭에서 크기가 0으로 초기화될 수 있으므로,
+ *    MyChart 가 "활성화 시 자기 스스로 리사이즈" 한다.
  */
 const ChartTabExample: React.FC = () => {
-  // 두 번째 탭 차트에 넣을 샘플 데이터
+  // zustand 에서 탭 정보 읽기
+  const tabs = useTabStore((s) => s.tabs)
+  const activeUuid = useTabStore((s) => s.activeUuid)
+  const setActiveByTabClick = useTabStore((s) => s.setActiveByTabClick)
+  const navigateWithRefetch = useTabStore((s) => s.navigateWithRefetch)
+  const addChartTab = useTabStore((s) => s.addChartTab)
+
   const secondTabData = [23, 45, 32, 67, 54, 78, 61]
 
-  // 탭 변경 시점을 알리는 신호 (변경할 때마다 +1)
-  const [resizeVersion, setResizeVersion] = useState(0)
+  // ⭐ 탭 A 버튼 → 고정 탭 B(RESIZE_UUID) 로 이동 + refetch 의도 표시
+  //    (탭 A에서 uuid 를 "셋팅" 후 B로 이동한다고 보면 된다)
+  const openMyChartWithRefetch = () => navigateWithRefetch(RESIZE_UUID)
+
+  // ⭐ 탭 A 버튼 → 새 MyChart 탭(B) 을 동적으로 추가하고 그 uuid 로 이동 + refetch
+  const addDynamicMyChartTab = () => {
+    const uuid = addChartTab() // store 가 새 uuid 발급
+    navigateWithRefetch(uuid)
+  }
+
+  const items = tabs.map((tab: ChartTab) => {
+    if (tab.kind === 'line') {
+      // 탭 A: SimpleLineChart (여기 버튼이 refetch 의도를 만든다)
+      return {
+        key: tab.key,
+        label: tab.label,
+        children: (
+          <Suspense fallback={<div>Loading chart...</div>}>
+            <SimpleLineChart
+              onOpenMyChart={openMyChartWithRefetch}
+              onAddDynamicMyChart={addDynamicMyChartTab}
+            />
+          </Suspense>
+        ),
+      }
+    }
+    // 탭 B: MyChart — id(=uuid) 로 queryKey 가 분리되고,
+    //        MyChart 내부에서 "자기가 refetch 대상+활성일 때" 스스로 refetch/리사이즈 한다
+    return {
+      key: tab.key,
+      label: tab.label,
+      children: <MyChart data={secondTabData} id={tab.key} />,
+    }
+  })
 
   return (
     <Card className="card-section" style={{ marginTop: 0 }}>
       <Title level={4} style={{ marginTop: 0 }}>
-        Tabs 안에 차트 배치 (antd)
+        Tabs 안에 차트 배치 (antd + zustand)
       </Title>
       <Paragraph type="secondary">
-        첫 번째 탭에는 <strong>SimpleLineChart</strong>, 두 번째 탭에는{' '}
-        <strong>탭 변경 시점 리사이즈 차트</strong>를 배치했습니다. 탭을 전환할 때 차트가 0
-        크기로 그려지지 않도록 리사이즈가 동작하는지 확인해 보세요.
+        탭 목록·활성 탭·refetch 의도는 <strong>useTabStore(zustand)</strong>가 관리합니다.{' '}
+        <strong>탭 A의 버튼</strong>으로 이동할 때만 대상 MyChart(B)가 refetch 되고,{' '}
+        <strong>탭을 클릭</strong>해서 B에 들어가면 refetch 되지 않습니다 (리사이즈만 수행).
       </Paragraph>
 
-      <Tabs
-        defaultActiveKey="line"
-        onChange={() => setResizeVersion((v) => v + 1)}
-        items={[
-          {
-            key: 'line',
-            label: '라인차트 (SimpleLineChart)',
-            children: (
-              <Suspense fallback={<div>Loading chart...</div>}>
-                <SimpleLineChart />
-              </Suspense>
-            ),
-          },
-          {
-            key: 'resize',
-            label: '리사이즈 처리 차트',
-            children: <MyChart data={secondTabData} resizeSignal={resizeVersion} />,
-          },
-        ]}
-      />
+      <Tabs activeKey={activeUuid ?? undefined} onChange={setActiveByTabClick} items={items} />
     </Card>
   )
 }

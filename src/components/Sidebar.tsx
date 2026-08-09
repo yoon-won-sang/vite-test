@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Menu } from 'antd'
-import { MenuFoldOutlined, FullscreenOutlined, UnorderedListOutlined } from '@ant-design/icons'
+import { MenuFoldOutlined, FullscreenOutlined, UnorderedListOutlined, BarChartOutlined } from '@ant-design/icons'
 import type { MenuItemType } from 'antd/es/menu/interface'
 import './Sidebar.css'
 
@@ -94,6 +94,21 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
       key: 'chart-tab-example',
       icon: <UnorderedListOutlined />,
       label: '탭 안 차트',
+    },
+    {
+      key: 'popup-bar-chart',
+      icon: <BarChartOutlined />,
+      label: '막대차트 팝업',
+    },
+    {
+      key: 'string-operations',
+      icon: <UnorderedListOutlined />,
+      label: '문자열 연산',
+    },
+    {
+      key: 'zustand-example',
+      icon: <UnorderedListOutlined />,
+      label: 'zustand 예제',
     },
   ]
 

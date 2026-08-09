@@ -6,6 +6,11 @@ const ReactECharts = React.lazy(() => import('echarts-for-react'))
 interface SeriesInfo {
   name: string
   api: string
+  // ⭐ 이 옵션이 true 이면 "데이터 없는 시리즈" 케이스를 재현한다.
+  //    - API 는 호출하지 않고 빈 배열([])만 selectedData 로 전달한다.
+  //    - 시리즈 자체는 차트에 등록되지만 그릴 데이터가 없으므로,
+  //      레전드(legend)에서도 제외되어야 한다.
+  empty?: boolean
 }
 
 /* ==================== 상수 ==================== */
@@ -17,6 +22,8 @@ const OPTIONAL_SERIES: SeriesInfo[] = [
   { name: 'Revenue', api: 'https://jsonplaceholder.typicode.com/posts?_limit=7' },
   { name: 'Profit', api: 'https://jsonplaceholder.typicode.com/comments?_limit=7' },
   { name: 'Expenses', api: 'https://jsonplaceholder.typicode.com/todos?_limit=7' },
+  // ⭐ 데이터가 없는 시리즈의 예 (시리즈는 등록되지만 빈 데이터)
+  { name: '데이터 없음', api: '', empty: true },
 ]
 
 /* ==================== 유틸 함수 ==================== */
@@ -36,7 +43,18 @@ const transformToChartData = (
 }
 
 /* ==================== 컴포넌트 ==================== */
-const SimpleLineChart: React.FC = () => {
+interface SimpleLineChartProps {
+  // 부모(ChartTabExample)의 내부 탭에서 "MyChart" 탭으로 이동시키기 위한 콜백
+  // prop 이 전달되지 않으면(예: App.tsx 에서 단독 사용) 버튼을 표시하지 않는다.
+  onOpenMyChart?: () => void
+  // ⭐ 부모(ChartTabExample)의 내부 탭에 "MyChart 탭을 동적으로 하나 추가"시키기 위한 콜백
+  onAddDynamicMyChart?: () => void
+}
+
+const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
+  onOpenMyChart,
+  onAddDynamicMyChart,
+}) => {
   const [selectedSeries, setSelectedSeries] = useState<string | null>(null)
   const [selectedData, setSelectedData] = useState<number[] | null>(null)
   const [loading, setLoading] = useState(false)
@@ -55,8 +73,12 @@ const SimpleLineChart: React.FC = () => {
     setLoading(true)
 
     try {
-      const response = await axios.get(seriesInfo.api)
-      const chartData = transformToChartData(name, response.data)
+      // ⭐ empty 옵션 시리즈는 API 를 호출하지 않고 빈 배열([])만 전달한다.
+      //   - 시리즈는 차트에 등록되지만 데이터가 없어 아무것도 그려지지 않는다.
+      //   - 이 경우 레전드에서도 제외한다 (buildOption 참고)
+      const chartData = seriesInfo.empty
+        ? []
+        : transformToChartData(name, (await axios.get(seriesInfo.api)).data)
       setSelectedData(chartData)
     } catch (error) {
       console.error(`[${name}] 데이터 로드 실패:`, error)
@@ -77,19 +99,23 @@ const SimpleLineChart: React.FC = () => {
       },
     ]
 
+    // 선택된 시리즈 등록 (데이터가 빈 배열([])이어도 시리즈 자체는 차트에 등록)
     if (selectedSeries && selectedData) {
       series.push({
         name: selectedSeries,
         type: 'line',
-        data: selectedData,
+        data: selectedData, // ⭐ 데이터 없음 케이스이면 [] 가 된다
         smooth: true,
       })
     }
 
+    // ⭐ 데이터가 없는(빈 배열) 시리즈의 이름은 legend 에서 제외한다.
+    const legendData = series.filter((s) => s.data.length > 0).map((s) => s.name)
+
     return {
       title: { text: 'Simple Line Chart', left: 'left' },
       tooltip: { trigger: 'axis' },
-      legend: { data: series.map((s) => s.name) },
+      legend: { data: legendData },
       xAxis: { type: 'category', data: X_AXIS_DATA },
       yAxis: { type: 'value' },
       series,
@@ -131,7 +157,29 @@ const SimpleLineChart: React.FC = () => {
             </option>
           ))}
         </select>
+
+        {/* ⭐ onOpenMyChart prop 이 있을 때만 표시: 클릭 시 부모(ChartTabExample)의 MyChart 탭으로 이동 */}
+        {onOpenMyChart && (
+          <button onClick={onOpenMyChart} style={styles.navButton}>
+            MyChart 탭으로 이동
+          </button>
+        )}
+
+        {/* ⭐ onAddDynamicMyChart prop 이 있을 때만 표시: 클릭 시 새 MyChart 탭을 동적으로 하나 추가 */}
+        {onAddDynamicMyChart && (
+          <button onClick={onAddDynamicMyChart} style={styles.addButton}>
+            MyChart 탭이동2 (동적 추가)
+          </button>
+        )}
       </div>
+
+      {/* ⭐ 선택된 시리즈의 데이터가 비어 있으면 차트에 그려지지 않고 레전드에서도 제외됨 */}
+      {selectedSeries && selectedData && selectedData.length === 0 && (
+        <div style={styles.hint}>
+          「{selectedSeries}」 시리즈는 데이터가 없어 차트에 표시되지 않았으며, 레전드에서도
+          제외되었습니다.
+        </div>
+      )}
 
       <Suspense fallback={<div>Loading chart...</div>}>
         <div style={{ width: '100%', height: 400, position: 'relative' }}>
@@ -159,6 +207,29 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 4,
     border: '1px solid #ccc',
     fontSize: 14,
+  },
+  hint: {
+    marginBottom: 8,
+    fontSize: 13,
+    color: '#fa8c16',
+  },
+  navButton: {
+    padding: '6px 14px',
+    borderRadius: 4,
+    border: '1px solid #1677ff',
+    backgroundColor: '#1677ff',
+    color: '#fff',
+    fontSize: 14,
+    cursor: 'pointer',
+  },
+  addButton: {
+    padding: '6px 14px',
+    borderRadius: 4,
+    border: '1px solid #52c41a',
+    backgroundColor: '#52c41a',
+    color: '#fff',
+    fontSize: 14,
+    cursor: 'pointer',
   },
   loadingOverlay: {
     position: 'absolute',
