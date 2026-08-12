@@ -110,6 +110,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
       icon: <UnorderedListOutlined />,
       label: 'zustand 예제',
     },
+    {
+      key: 'sso-iframe-popup',
+      icon: <UnorderedListOutlined />,
+      label: 'SSO iframe 팝업',
+    },
   ]
 
   const toggleCollapse = () => {

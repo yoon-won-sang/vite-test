@@ -10,7 +10,7 @@ const Charts: React.FC = () => {
     yAxis: { type: 'value' },
     dataZoom: [
       { type: 'inside', start: 0, end: 100 },
-      { type: 'slider', start: 0, end: 100, height: 20, bottom: 10 },
+      { type: 'slider', start: 0, end: 100, height: 40, bottom: 15 },
     ],
     series: [
       {
@@ -20,6 +20,16 @@ const Charts: React.FC = () => {
         itemStyle: { color: '#85CBFF' },
       },
     ],
+  }
+
+  // bar 차트의 dataZoom 영역이 클릭/조작될 때 호출되는 이벤트 핸들러
+  const barEvents = {
+    datazoom: (params: any) => {
+      console.log('📊 bar dataZoom 이벤트:', params)
+    },
+    // click: (params: any) => {
+    //   console.log('📊 bar 클릭 이벤트:', params)
+    // },
   }
 
   const lineOption = {
@@ -76,9 +86,7 @@ const Charts: React.FC = () => {
         },
       },
     },
-    dataZoom: [
-      { type: 'inside', start: 0, end: 100 },
-    ],
+    dataZoom: [{ type: 'inside', start: 0, end: 100 }],
     series: [
       {
         symbolSize: 20,
@@ -112,16 +120,49 @@ const Charts: React.FC = () => {
   }
 
   const chartRef = useRef(null)
+  const barChartRef = useRef(null)
   const [zoomActive, setZoomActive] = useState(false)
+
+  // bar 차트의 zoom 패널(dataZoom slider) 클릭 감지
+  // ECharts의 chart-level 'click' 이벤트는 slider 내부 요소에는 발생하지 않으므로
+  // ZRender(getZr) 레벨에서 클릭 대상이 slider 그룹에 속하는지 판별한다.
+  const onBarChartReady = (chart: any) => {
+    if (chart.__barZoomClickAttached) return
+    chart.__barZoomClickAttached = true
+
+    const sliderModel = chart.getModel().getComponent('dataZoom', 1) // 0: inside, 1: slider
+    const sliderView = sliderModel && chart.getViewOfComponentModel(sliderModel)
+    const sliderGroup = sliderView && sliderView.group
+    if (!sliderGroup) return
+
+    chart.getZr().on('click', (e: any) => {
+      let el = e && e.target
+      while (el) {
+        if (el === sliderGroup) {
+          console.log('📊 bar zoom 패널 클릭:', e)
+          return
+        }
+        el = el.parent
+      }
+    })
+  }
 
   const toggleZoom = () => {
     if (chartRef.current) {
       // @ts-ignore
       const chart = chartRef.current.getEchartsInstance()
       if (zoomActive) {
-        chart.dispatchAction({ type: 'takeGlobalCursor', key: 'dataZoomSelect', dataZoomSelectActive: false })
+        chart.dispatchAction({
+          type: 'takeGlobalCursor',
+          key: 'dataZoomSelect',
+          dataZoomSelectActive: false,
+        })
       } else {
-        chart.dispatchAction({ type: 'takeGlobalCursor', key: 'dataZoomSelect', dataZoomSelectActive: true })
+        chart.dispatchAction({
+          type: 'takeGlobalCursor',
+          key: 'dataZoomSelect',
+          dataZoomSelectActive: true,
+        })
       }
       setZoomActive(!zoomActive)
     }
@@ -138,7 +179,14 @@ const Charts: React.FC = () => {
       <h2 style={{ marginTop: 0 }}>Charts (ECharts)</h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
         <Suspense fallback={<div>Loading charts…</div>}>
-          <button onClick={toggleZoom} style={{ marginBottom: '10px', background: zoomActive ? '#1677ff' : undefined, color: zoomActive ? '#fff' : undefined }}>
+          <button
+            onClick={toggleZoom}
+            style={{
+              marginBottom: '10px',
+              background: zoomActive ? '#1677ff' : undefined,
+              color: zoomActive ? '#fff' : undefined,
+            }}
+          >
             {zoomActive ? 'Zoom ON' : 'Zoom OFF'}
           </button>
           <button onClick={resetZoom} style={{ marginBottom: '10px' }}>
@@ -149,7 +197,13 @@ const Charts: React.FC = () => {
           </div>
           <div style={{ background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
-            <ReactECharts option={barOption} style={{ height: 320 }} />
+            <ReactECharts
+              ref={barChartRef}
+              option={barOption}
+              onEvents={barEvents}
+              onChartReady={onBarChartReady}
+              style={{ height: 320 }}
+            />
           </div>
           <div style={{ background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}

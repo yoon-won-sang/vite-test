@@ -34,6 +34,7 @@ import ChartTabExample from './components/ChartTabExample'
 import PopupBarChart from './components/PopupBarChart'
 import StringOperations from './components/StringOperations'
 import ZustandExample from './components/ZustandExample'
+import SsoIframePopup from './components/SsoIframePopup'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -313,6 +314,12 @@ function App() {
       label: 'zustand 예제',
       icon: <AppstoreAddOutlined />,
       children: <ZustandExample />,
+    },
+    {
+      key: 'sso-iframe-popup',
+      label: 'SSO iframe 팝업',
+      icon: <AppstoreAddOutlined />,
+      children: <SsoIframePopup />,
     },
   ]
 
