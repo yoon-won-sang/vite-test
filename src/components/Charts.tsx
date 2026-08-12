@@ -10,7 +10,19 @@ const Charts: React.FC = () => {
     yAxis: { type: 'value' },
     dataZoom: [
       { type: 'inside', start: 0, end: 100 },
-      { type: 'slider', start: 0, end: 100, height: 40, bottom: 15 },
+      {
+        type: 'slider',
+        start: 0,
+        end: 100,
+        height: 40,
+        bottom: 15,
+        // 이동손잡이(move handle) 넓이 커스텀
+        moveHandleSize: 24,
+        moveHandleStyle: {
+          color: '#1677ff',
+          opacity: 0.9,
+        },
+      },
     ],
     series: [
       {
