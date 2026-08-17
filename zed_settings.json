@@ -1,0 +1,74 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "edit_predictions": {
+    "provider": "ollama"
+  },
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
+  "terminal": {
+    "dock": "right",
+    "font_size": 16.0
+  },
+  "buffer_line_height": "comfortable",
+  "buffer_font_weight": 500.0,
+  "vim_mode": true,
+  "vim": {
+    "toggle_relative_line_numbers": true,
+  },
+  "ui_font_size": 17.0,
+  "buffer_font_size": 14.0,
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "Ayu Dark",
+    // 기존 설정들이 위에 있다면 여기에 반드시 쉼표(,)를 붙여야 합니다.
+  },
+  "languages": {
+    "TSX": {
+      "language_servers": [
+        "vtsls",   // 👈 TypeScript/JSX 핵심 문법 검사기를 강제로 켭니다!
+        "!eslint"  // 👈 파싱 에러를 일으키는 ESLint만 정확히 끕니다.
+      ]
+    },
+    "TypeScript": {
+      "language_servers": [
+        "vtsls",   // 👈 일반 .ts 파일도 정상 검사하도록 설정합니다.
+        "!eslint"
+      ]
+    }
+  },
+  "lsp": {
+    "vtsls": {
+      "initialization_options": {
+        "typescript": {
+          "tsdk": "./node_modules/typescript/lib" // 프로젝트 내부 TS 버전을 우선 사용
+        }
+      }
+    }
+  },
+  // "theme_overrides": {
+  //   "One Dark": {
+  //     // 1. 일반 검색 및 Sneak 일치 항목 강제 변경
+  //     "search.match_background": "#FF00FF80",
+  //     "search.active_match_background": "#FF00FFFF",
+
+  //     // 2. LSP가 덮어쓰지 못하도록 배경을 투명하게 밀어버림
+  //     "editor.document_highlight.read_background": "#00000000",
+  //     "editor.document_highlight.write_background": "#00000000",
+
+  //     // 3. (추가) 현재 활성화된 일치 텍스트 블록 레이어 강제 변경
+  //     "element.active": "#FF00FF80",
+  //     "element.selected": "#FF00FF50"
+  //   }
+  // }
+}
