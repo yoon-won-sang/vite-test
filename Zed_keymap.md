@@ -43,13 +43,13 @@
     "g e": "vim::PreviousSubwordEnd"
   }
 },
-{
-  "context": "vim_mode == normal || vim_mode == visual",
-  "bindings": {
-    "s": "vim::PushSneak",
-    "shift-s": "vim::PushSneakBackward"
-  }
-},
+// {
+//   "context": "vim_mode == normal || vim_mode == visual",
+//   "bindings": {
+//     "s": "vim::PushSneak",
+//     "shift-s": "vim::PushSneakBackward"
+//   }
+// },
 // This key binding will work when you're editing a file. It comes built into Zed by default as the workspace: save command.
 {
   "context": "Workspace",
@@ -70,7 +70,7 @@
      "g w": "vim::HelixJumpToWord",
 
      // 2. 단축키 하나로 편하게 쓰고 싶다면: s 키에 바로 할당
-     "s": "vim::HelixJumpToWord"
+     // "s": "vim::HelixJumpToWord"
    }
  }
 ]
