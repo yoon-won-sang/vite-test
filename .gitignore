@@ -25,3 +25,4 @@ dist-ssr
 
 # pnpm
 pnpm-lock.yaml
+/litellm_config.yaml
