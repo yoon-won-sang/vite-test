@@ -159,6 +159,66 @@ const Charts: React.FC = () => {
     ],
   }
 
+  const exponentialData19 = Array.from({ length: 20 }, (_, i) => {
+    const time = new Date(2026, 7, 20, 0, 0, 0).getTime() + i * 15 * 60000
+    return [time, Math.pow(1.9, i)]
+  })
+
+  const exponentialData18 = Array.from({ length: 20 }, (_, i) => {
+    const time = new Date(2026, 7, 20, 0, 0, 0).getTime() + i * 15 * 60000
+    return [time, Math.pow(1.8, i)]
+  })
+
+  const exponentialData16 = Array.from({ length: 20 }, (_, i) => {
+    const time = new Date(2026, 7, 20, 0, 0, 0).getTime() + i * 15 * 60000
+    return [time, Math.pow(1.6, i)]
+  })
+
+  const exponentialData15 = Array.from({ length: 20 }, (_, i) => {
+    const time = new Date(2026, 7, 20, 0, 0, 0).getTime() + i * 15 * 60000
+    return [time, Math.pow(1.5, i)]
+  })
+
+  const exponentialOption = {
+    title: { text: 'Exponential Growth', left: 'center' },
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['Growth 1.9', 'Growth 1.8', 'Growth 1.6', 'Growth 1.5'], top: 30 },
+    grid: {
+      top: 60,
+      bottom: 60,
+      left: 60,
+      right: 60,
+    },
+    xAxis: { type: 'time' },
+    yAxis: { type: 'value' },
+    series: [
+      {
+        name: 'Growth 1.9',
+        type: 'line',
+        data: exponentialData19,
+        itemStyle: { color: '#FFB347' },
+      },
+      {
+        name: 'Growth 1.8',
+        type: 'line',
+        data: exponentialData18,
+        itemStyle: { color: '#eb2f96' },
+      },
+      {
+        name: 'Growth 1.6',
+        type: 'line',
+        data: exponentialData16,
+        itemStyle: { color: '#52c41a' },
+      },
+      {
+        name: 'Growth 1.5',
+        type: 'line',
+        data: exponentialData15,
+        itemStyle: { color: '#1677ff' },
+      },
+    ],
+  }
+
   const chartRef = useRef(null)
   const barChartRef = useRef(null)
   const [zoomActive, setZoomActive] = useState(false)
@@ -270,6 +330,10 @@ const Charts: React.FC = () => {
           <button onClick={resetZoom} style={{ marginBottom: '10px' }}>
             Reset Zoom
           </button>
+          <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
+            {/* @ts-ignore */}
+            <ReactECharts option={exponentialOption} style={{ height: 380 }} />
+          </div>
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
             <ReactECharts ref={chartRef} option={scatterOption} style={{ height: 380 }} />
           </div>
