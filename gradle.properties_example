@@ -1,0 +1,13 @@
+# 1. 파일 시스템 감시 활성화 (저장 즉시 변경 감지)
+org.gradle.vfs.watch=true
+
+# 2. 빌드 구성 단계 캐싱 (매번 빌드 구조를 다시 분석하는 3초 딜레이 제거)
+org.gradle.configuration-cache=true
+
+# 3. 데몬 및 병렬 빌드 활성화
+org.gradle.daemon=true
+org.gradle.parallel=true
+
+# 4. 컴파일러에 충분한 메모리 할당 (본인 RAM 상황에 맞게 2g~4g 설정)
+org.gradle.jvmargs=-Xmx2g -XX:+UseParallelGC
+
