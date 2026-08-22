@@ -2,7 +2,7 @@ import React, { Suspense, useRef, useState } from 'react'
 
 const ReactECharts = React.lazy(() => import('echarts-for-react'))
 
-const Y_AXIS_PADDING_RATIO = 0.05
+const Y_AXIS_PADDING_RATIO = 0.03
 
 const calculatePadding = (minVal: number, maxVal: number, ratio: number) => {
   const range = maxVal - minVal || 1
@@ -27,12 +27,13 @@ const applyDynamicPadding = (chart: any, ratio: number) => {
   const bottomPixel = rect.y + rect.height
   const newMax = chart.convertFromPixel({ yAxisIndex: 0 }, topPixel - paddingPx)
   const newMin = chart.convertFromPixel({ yAxisIndex: 0 }, bottomPixel + paddingPx)
-
+  console.log('newMin', newMin);
   const currentOption = chart.getOption()
   const seriesData = currentOption.series[0].data.map((d: any) => (Array.isArray(d) ? d[1] : d))
   const precision = getPrecision(seriesData)
 
   const roundedMin = Number(newMin.toFixed(precision))
+  console.log('roundedMin', roundedMin);
   const roundedMax = Number(newMax.toFixed(precision))
 
   if (Math.abs((currentOption.yAxis[0].min as number) - roundedMin) > Math.pow(10, -precision) ||
@@ -93,7 +94,7 @@ const Charts: React.FC = () => {
     let value
     if (i < 50) {
       // 50개: 4.0 ~ 7.4 사이
-      value = 4.0 + Math.random() * (7.4 - 4.0)
+      value = 400.0 + Math.random() * (700.5 - 400.0)
     } else {
       // 50개: 0.023451 ~ 0.02999 사이
       value = 0.023451 + Math.random() * (0.02999 - 0.023451)
@@ -121,6 +122,15 @@ const Charts: React.FC = () => {
       type: 'value',
       min: minVal - padding,
       max: maxVal + padding,
+      axisLabel: {
+        formatter: (value: number) => {
+          // 최대값과 최소값을 숨김
+          if (value === minVal - padding || value === maxVal + padding) {
+            return '';
+          }
+          return value.toString();
+        },
+      },
     },
     dataZoom: [
       { type: 'inside', start: 0, end: 100 },
