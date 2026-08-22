@@ -2,7 +2,7 @@ import React, { Suspense, useRef, useState } from 'react'
 
 const ReactECharts = React.lazy(() => import('echarts-for-react'))
 
-const Y_AXIS_PADDING_RATIO = 0.03
+const Y_AXIS_PADDING_RATIO = 0.04
 
 const calculatePadding = (minVal: number, maxVal: number, ratio: number) => {
   const range = maxVal - minVal || 1
