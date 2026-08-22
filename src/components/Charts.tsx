@@ -2,6 +2,51 @@ import React, { Suspense, useRef, useState } from 'react'
 
 const ReactECharts = React.lazy(() => import('echarts-for-react'))
 
+const Y_AXIS_PADDING_RATIO = 0.05
+
+const calculatePadding = (minVal: number, maxVal: number, ratio: number) => {
+  const range = maxVal - minVal || 1
+  return range * ratio
+}
+
+const getPrecision = (values: number[]) => {
+  const minVal = Math.min(...values)
+  const maxVal = Math.max(...values)
+  const range = maxVal - minVal || 1
+  // 범위의 로그를 통해 대략적인 소수점 자리수 계산 (최소 2자리 보장)
+  const order = Math.floor(Math.log10(range))
+  return Math.max(2, Math.abs(order) + 2)
+}
+
+const applyDynamicPadding = (chart: any, ratio: number) => {
+  const grid = chart.getModel().getComponent('grid', 0)
+  const rect = grid.coordinateSystem.getRect()
+  const chartHeight = rect.height
+  const paddingPx = chartHeight * ratio
+  const topPixel = rect.y
+  const bottomPixel = rect.y + rect.height
+  const newMax = chart.convertFromPixel({ yAxisIndex: 0 }, topPixel - paddingPx)
+  const newMin = chart.convertFromPixel({ yAxisIndex: 0 }, bottomPixel + paddingPx)
+
+  const currentOption = chart.getOption()
+  const seriesData = currentOption.series[0].data.map((d: any) => (Array.isArray(d) ? d[1] : d))
+  const precision = getPrecision(seriesData)
+
+  const roundedMin = Number(newMin.toFixed(precision))
+  const roundedMax = Number(newMax.toFixed(precision))
+
+  if (Math.abs((currentOption.yAxis[0].min as number) - roundedMin) > Math.pow(10, -precision) ||
+      Math.abs((currentOption.yAxis[0].max as number) - roundedMax) > Math.pow(10, -precision)) {
+    chart.setOption({
+      yAxis: {
+        min: roundedMin,
+        max: roundedMax,
+      },
+    })
+    console.log(`픽셀 기반 ${ratio * 100}% 여백 적용 (정밀도 ${precision}): min=${roundedMin}, max=${roundedMax}`)
+  }
+}
+
 const Charts: React.FC = () => {
   const barOption = {
     title: { text: 'Monthly Sales', left: 'center' },
@@ -63,7 +108,7 @@ const Charts: React.FC = () => {
   const minVal = Math.min(...values)
   const maxVal = Math.max(...values)
   const range = maxVal - minVal || 1
-  const padding = range * 0.10
+  const padding = calculatePadding(minVal, maxVal, Y_AXIS_PADDING_RATIO)
 
   const lineOption = {
     title: { text: 'Visitors', left: 'center' },
@@ -275,41 +320,7 @@ const Charts: React.FC = () => {
     }
   }
   const onLineChartReady = (chart: any) => {
-    // 1. 그리드 정보 가져오기
-    const grid = chart.getModel().getComponent('grid', 0)
-    const rect = grid.coordinateSystem.getRect()
-    const chartHeight = rect.height
-
-    // 2. 10% 픽셀 여백 계산
-    const paddingPx = chartHeight * 0.1
-
-    // 3. 현재 y축 범위의 상단/하단 픽셀 위치
-    const topPixel = rect.y
-    const bottomPixel = rect.y + rect.height
-
-    // 4. 10%만큼 확장된 새로운 픽셀 위치 계산
-    const newTopPixel = topPixel - paddingPx
-    const newBottomPixel = bottomPixel + paddingPx
-
-    // 5. 새로운 픽셀 위치를 다시 데이터 값으로 변환
-    const newMax = chart.convertFromPixel({ yAxisIndex: 0 }, newTopPixel)
-    const newMin = chart.convertFromPixel({ yAxisIndex: 0 }, newBottomPixel)
-
-    // 6. 차트 옵션 업데이트 (무한 루프 방지)
-    const currentOption = chart.getOption()
-    const currentMin = currentOption.yAxis[0].min
-    const currentMax = currentOption.yAxis[0].max
-
-    // 값이 유의미하게 다를 때만 업데이트 (오차 범위 고려)
-    if (Math.abs((currentMin as number) - newMin) > 0.0001 || Math.abs((currentMax as number) - newMax) > 0.0001) {
-      chart.setOption({
-        yAxis: {
-          min: newMin,
-          max: newMax,
-        },
-      })
-      console.log(`픽셀 기반 10% 여백 적용: min=${newMin.toFixed(4)}, max=${newMax.toFixed(4)}`)
-    }
+    applyDynamicPadding(chart, Y_AXIS_PADDING_RATIO)
   }
 
   return (
