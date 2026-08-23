@@ -123,12 +123,19 @@ const Charts: React.FC = () => {
       min: minVal - padding,
       max: maxVal + padding,
       axisLabel: {
-        formatter: (value: number) => {
-          // 최대값과 최소값을 숨김
-          if (value === minVal - padding || value === maxVal + padding) {
-            return '';
-          }
-          return value.toString();
+        showMinLabel: false,
+        showMaxLabel: false,
+      },
+      splitLine: {
+        lineStyle: {
+          color: (value: number) => {
+            // 비교 허용 오차를 좀 더 크게 잡아봅니다.
+            const min = minVal - padding;
+            const max = maxVal + padding;
+            return (Math.abs(value - min) < 0.1 || Math.abs(value - max) < 0.1)
+              ? 'transparent'
+              : '#ccc';
+          },
         },
       },
     },
