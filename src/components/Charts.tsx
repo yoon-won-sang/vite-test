@@ -174,23 +174,59 @@ const Charts: React.FC = () => {
     ],
   }
 
-  // 2만개 데이터 세트 생성 (좌표 일치)
-  const largeData1 = Array.from({ length: 20000 }, (_, i) => [i, Math.sin(i / 100) * 100 + Math.random() * 20])
-  const largeData2 = Array.from({ length: 20000 }, (_, i) => [i, Math.cos(i / 100) * 100 + Math.random() * 20])
-  const largeData3 = [...largeData2] // 빨간색(Set 2)과 좌표 일치
-  const largeData4 = [...largeData1] // 파란색(Set 1)과 좌표 일치
-  const largeData5 = [...largeData2] // 빨간색(Set 2)과 좌표 일치
+  // 8월 한 달간의 데이터를 초 단위로 생성
+  const startDate = new Date(2026, 7, 1, 0, 0, 0).getTime()
+  const endDate = new Date(2026, 8, 1, 0, 0, 0).getTime()
+  const totalSeconds = (endDate - startDate) / 1000
+  const step = Math.floor(totalSeconds / 20000)
+
+  const largeData1 = Array.from({ length: 20000 }, (_, i) => [startDate + i * step * 1000, Math.sin(i / 100) * 100 + Math.random() * 20])
+  const largeData2 = Array.from({ length: 20000 }, (_, i) => [startDate + i * step * 1000, Math.cos(i / 100) * 100 + Math.random() * 20])
+  const largeData3 = [...largeData2]
+  const largeData4 = [...largeData1]
+  const largeData5 = [...largeData2]
 
   const largeDataOption = {
-    title: { text: '20,000 Points x 5 Sets Scatter', left: 'center' },
+    title: { text: 'August Data (Seconds)', left: 'center' },
     legend: { show: true, top: 30 },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross'
+      },
+      formatter: (params: any) => {
+        const data = params[0].data;
+        const date = new Date(data[0]);
+        return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}<br/>
+                ${params.map((p: any) => `${p.marker} ${p.seriesName}: ${p.value[1].toFixed(2)}`).join('<br/>')}`;
+      }
+    },
     toolbox: {
       feature: {
         dataZoom: { yAxisIndex: 'none' },
         restore: {},
       },
     },
-    xAxis: { type: 'value' },
+    xAxis: {
+      type: 'time',
+      axisLabel: {
+        formatter: (value: number, index: number) => {
+          const date = new Date(value);
+          const hour = date.getHours();
+          const minute = date.getMinutes();
+          const second = date.getSeconds();
+
+          // 초가 0이면(분 단위) 혹은 초/분이 0이면(일 단위)
+          if (hour === 0 && minute === 0 && second === 0) {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+          } else if (second === 0) {
+            return `${hour}:${minute < 10 ? '0' + minute : minute}`;
+          } else {
+            return `${hour}:${minute < 10 ? '0' + minute : minute}:${second < 10 ? '0' + second : second}`;
+          }
+        }
+      }
+    },
     yAxis: { type: 'value' },
     dataZoom: [{ type: 'inside' }, { type: 'slider' }],
     series: [
