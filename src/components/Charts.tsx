@@ -210,13 +210,12 @@ const Charts: React.FC = () => {
     xAxis: {
       type: 'time',
       axisLabel: {
-        formatter: (value: number, index: number) => {
+        formatter: (value: number) => {
           const date = new Date(value);
           const hour = date.getHours();
           const minute = date.getMinutes();
           const second = date.getSeconds();
 
-          // 초가 0이면(분 단위) 혹은 초/분이 0이면(일 단위)
           if (hour === 0 && minute === 0 && second === 0) {
             return `${date.getMonth() + 1}/${date.getDate()}`;
           } else if (second === 0) {
@@ -225,7 +224,8 @@ const Charts: React.FC = () => {
             return `${hour}:${minute < 10 ? '0' + minute : minute}:${second < 10 ? '0' + second : second}`;
           }
         }
-      }
+      },
+      minInterval: 3600 * 24 * 1000, // 1일 단위 최소 간격
     },
     yAxis: { type: 'value' },
     dataZoom: [{ type: 'inside' }, { type: 'slider' }],
