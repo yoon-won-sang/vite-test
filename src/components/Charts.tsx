@@ -174,49 +174,91 @@ const Charts: React.FC = () => {
     ],
   }
 
-  const scatterOption = {
-    tooltip: { trigger: 'item' },
-    xAxis: {},
-    yAxis: {},
+  // 2만개 데이터 세트 생성 (좌표 일치)
+  const largeData1 = Array.from({ length: 20000 }, (_, i) => [i, Math.sin(i / 100) * 100 + Math.random() * 20])
+  const largeData2 = Array.from({ length: 20000 }, (_, i) => [i, Math.cos(i / 100) * 100 + Math.random() * 20])
+  const largeData3 = [...largeData2] // 빨간색(Set 2)과 좌표 일치
+  const largeData4 = [...largeData1] // 파란색(Set 1)과 좌표 일치
+  const largeData5 = [...largeData2] // 빨간색(Set 2)과 좌표 일치
+
+  const largeDataOption = {
+    title: { text: '20,000 Points x 5 Sets Scatter', left: 'center' },
+    legend: { show: true, top: 30 },
     toolbox: {
       feature: {
-        dataZoom: {
-          yAxisIndex: 'none',
-        },
-        brush: {
-          type: ['rect', 'keep', 'clear'],
-        },
+        dataZoom: { yAxisIndex: 'none' },
+        restore: {},
       },
     },
-    dataZoom: [{ type: 'inside', start: 0, end: 100 }],
+    xAxis: { type: 'value' },
+    yAxis: { type: 'value' },
+    dataZoom: [{ type: 'inside' }, { type: 'slider' }],
     series: [
       {
-        symbolSize: 20,
-        data: [
-          [10.0, 8.04],
-          [8.07, 6.95],
-          [13.0, 7.58],
-          [9.05, 8.81],
-          [11.0, 8.33],
-          [14.0, 7.66],
-          [13.4, 6.81],
-          [10.0, 6.33],
-          [14.0, 8.96],
-          [12.5, 6.82],
-          [9.15, 7.2],
-          [11.5, 7.2],
-          [3.03, 4.23],
-          [12.2, 7.83],
-          [2.02, 4.47],
-          [1.05, 3.33],
-          [4.05, 4.96],
-          [6.03, 7.24],
-          [12.0, 6.26],
-          [12.0, 8.84],
-          [7.08, 5.82],
-          [5.02, 5.68],
-        ],
+        name: 'Set 1 (Blue)',
         type: 'scatter',
+        data: largeData1,
+        large: true,
+        largeThreshold: 2000,
+        symbolSize: 2,
+        // sampling: 'average', // 데이터가 너무 많을 경우 샘플링하여 렌더링
+        progressive: 0,
+        progressiveThreshold: 0,
+        animation: false,
+        hoverAnimation: false,
+        itemStyle: { opacity: 0.6 }
+      },
+      {
+        name: 'Set 2 (Red)',
+        type: 'scatter',
+        data: largeData2,
+        large: true,
+        largeThreshold: 2000,
+        symbolSize: 2,
+        progressive: 0,
+        progressiveThreshold: 0,
+        animation: false,
+        hoverAnimation: false,
+        itemStyle: { color: 'red', opacity: 0.6 }
+      },
+      {
+        name: 'Set 3 (Orange)',
+        type: 'scatter',
+        data: largeData3,
+        large: true,
+        largeThreshold: 2000,
+        symbolSize: 2,
+        progressive: 0,
+        progressiveThreshold: 0,
+        animation: false,
+        hoverAnimation: false,
+        itemStyle: { color: 'orange', opacity: 0.6 }
+      },
+      {
+        name: 'Set 4 (Purple)',
+        type: 'scatter',
+        data: largeData4,
+        large: true,
+        largeThreshold: 2000,
+        symbolSize: 2,
+        progressive: 0,
+        progressiveThreshold: 0,
+        animation: false,
+        hoverAnimation: false,
+        itemStyle: { color: 'purple', opacity: 0.6 }
+      },
+      {
+        name: 'Set 5 (Black)',
+        type: 'scatter',
+        data: largeData5,
+        large: true,
+        largeThreshold: 2000,
+        symbolSize: 2,
+        progressive: 0,
+        progressiveThreshold: 0,
+        animation: false,
+        hoverAnimation: false,
+        itemStyle: { color: 'black', opacity: 0.6 }
       },
     ],
   }
@@ -280,12 +322,46 @@ const Charts: React.FC = () => {
       },
     ],
   }
+  const threeHourOption = {
+    title: { text: '3-Hour Intervals', left: 'center' },
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'time',
+      splitLine: { show: false },
+      min: new Date(2026, 7, 20, 0, 0, 0).getTime(),
+      max: new Date(2026, 7, 20, 21, 0, 0).getTime(),
+      axisLabel: {
+        interval: 0,
+        formatter: (value: number) => {
+          const date = new Date(value)
+          const h = date.getHours()
+          const m = date.getMinutes()
+          if (h % 3 !== 0 || m !== 0) return ''
+          const hh = String(h).padStart(2,'0')
+          const mm = String(m).padStart(2,'0')
+          const ss = String(date.getSeconds()).padStart(2,'0')
+          return `${hh}:${mm}:${ss}`
+        },
+      },
+    },
+    series: [
+      {
+        name: '3-Hour Data',
+        type: 'line',
+        smooth: true,
+        data: Array.from({ length: 85 }, (_, i) => {
+          const time = new Date(2026, 7, 20, 0, 0, 0).getTime() + i * 15 * 60000
+          const value = 1 + (i / 84) * 20
+          return [time, value]
+        }),
+        itemStyle: { color: '#722ed1' },
+      },
+    ],
+  }
 
   const chartRef = useRef(null)
   const barChartRef = useRef(null)
   const [zoomActive, setZoomActive] = useState(false)
-
-  // bar 차트의 zoom 패널(dataZoom slider) 클릭 감지
   // ECharts의 chart-level 'click' 이벤트는 slider 내부 요소에는 발생하지 않으므로
   // ZRender(getZr) 레벨에서 클릭 대상이 slider 그룹에 속하는지 판별한다.
   const onBarChartReady = (chart: any) => {
@@ -363,7 +439,8 @@ const Charts: React.FC = () => {
             <ReactECharts option={exponentialOption} style={{ height: 380 }} />
           </div>
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
-            <ReactECharts ref={chartRef} option={scatterOption} style={{ height: 380 }} />
+            {/* @ts-ignore */}
+            <ReactECharts option={largeDataOption} style={{ height: 380 }} />
           </div>
           <div style={{ background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
@@ -386,6 +463,10 @@ const Charts: React.FC = () => {
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
             <ReactECharts option={pieOption} style={{ height: 380 }} />
+          </div>
+          <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
+            {/* @ts-ignore */}
+            <ReactECharts option={threeHourOption} style={{ height: 380 }} />
           </div>
         </Suspense>
       </div>
