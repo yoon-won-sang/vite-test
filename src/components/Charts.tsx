@@ -208,41 +208,43 @@ const Charts: React.FC = () => {
       },
     },
     xAxis: {
-      type: 'time',
+      type: 'time', // 시간 축 (연속형 데이터)
       axisLabel: {
-        formatter: (value: number) => {
+        formatter: (value: number) => { // 축 레이블 포맷 설정
           const date = new Date(value);
           const hour = date.getHours();
           const minute = date.getMinutes();
           const second = date.getSeconds();
 
+          // 0시 0분 0초에는 날짜 표시
           if (hour === 0 && minute === 0 && second === 0) {
             return `${date.getMonth() + 1}/${date.getDate()}`;
           } else if (second === 0) {
+            // 0초일 때는 시:분 표시
             return `${hour}:${minute < 10 ? '0' + minute : minute}`;
           } else {
+            // 그 외에는 시:분:초 표시
             return `${hour}:${minute < 10 ? '0' + minute : minute}:${second < 10 ? '0' + second : second}`;
           }
         }
       },
-      minInterval: 3600 * 24 * 1000, // 1일 단위 최소 간격
+      minInterval: 3600 * 24 * 1000, // 최소 축 간격을 1일로 설정
     },
-    yAxis: { type: 'value' },
-    dataZoom: [{ type: 'inside' }, { type: 'slider' }],
+    yAxis: { type: 'value' }, // Y축 값 축
+    dataZoom: [{ type: 'inside' }, { type: 'slider' }], // 데이터 줌 (내부 드래그, 슬라이더)
     series: [
       {
         name: 'Set 1 (Blue)',
-        type: 'scatter',
+        type: 'scatter', // 산점도 차트
         data: largeData1,
-        large: true,
-        largeThreshold: 2000,
-        symbolSize: 2,
-        // sampling: 'average', // 데이터가 너무 많을 경우 샘플링하여 렌더링
-        progressive: 0,
+        large: true, // 대량 데이터 처리 최적화
+        largeThreshold: 2000, // 최적화 임계값
+        symbolSize: 2, // 데이터 포인트 크기
+        progressive: 0, // 점진적 렌더링 끄기
         progressiveThreshold: 0,
-        animation: false,
-        hoverAnimation: false,
-        itemStyle: { opacity: 0.6 }
+        animation: false, // 애니메이션 비활성화 (성능 향상)
+        hoverAnimation: false, // 호버 효과 비활성화 (성능 향상)
+        itemStyle: { opacity: 0.6 } // 투명도 설정
       },
       {
         name: 'Set 2 (Red)',
