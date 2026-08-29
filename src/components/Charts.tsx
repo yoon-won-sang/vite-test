@@ -178,10 +178,10 @@ const Charts: React.FC = () => {
   const startDate = new Date(2026, 7, 1, 0, 0, 0).getTime()
   const endDate = new Date(2026, 8, 1, 0, 0, 0).getTime()
   const totalSeconds = (endDate - startDate) / 1000
-  const step = Math.floor(totalSeconds / 20000)
+  const step = Math.floor(totalSeconds / 2000)
 
-  const largeData1 = Array.from({ length: 20000 }, (_, i) => [startDate + i * step * 1000, Math.sin(i / 100) * 100 + Math.random() * 20])
-  const largeData2 = Array.from({ length: 20000 }, (_, i) => [startDate + i * step * 1000, Math.cos(i / 100) * 100 + Math.random() * 20])
+  const largeData1 = Array.from({ length: 2000 }, (_, i) => [startDate + i * step * 1000, Math.sin(i / 100) * 100 + Math.random() * 20])
+  const largeData2 = Array.from({ length: 2000 }, (_, i) => [startDate + i * step * 1000, Math.cos(i / 100) * 100 + Math.random() * 20])
   const largeData3 = [...largeData2]
   const largeData4 = [...largeData1]
   const largeData5 = [...largeData2]
@@ -453,7 +453,33 @@ const Charts: React.FC = () => {
   const onLineChartReady = (chart: any) => {
     applyDynamicPadding(chart, Y_AXIS_PADDING_RATIO)
   }
+// 레전드 토글 시 잔상 방지를 위한 핸들러 (clear + setOption)
+const onLegendSelectChanged = (chart: any) => {
+  chart.on('legendselectchanged', (params: any) => {
+    console.log('📊 legend select changed:', params)
+    const option = chart.getOption()
+    const series = option.series
+    chart.clear()
+    chart.setOption(
+      { ...option, series },
+      { notMerge: true, lazyUpdate: false }
+    )
+  })
+}
+// 'August Data (Seconds)' 데이터 Zoom 이벤트 핸들러
+const largeDataEvents = {
+  datazoom: (params: any) => {
+    console.log('📊 seconds (largeData) dataZoom 이벤트:', params)
+  },
+}
 
+
+// 'line chart' 데이터 Zoom 이벤트 핸들러
+const lineEvents = {
+  datazoom: (params: any) => {
+    console.log('📊 line chart dataZoom 이벤트:', params)
+  },
+}
   return (
     <div className="card-section">
       <h2 style={{ marginTop: 0 }}>Charts (ECharts)</h2>
@@ -474,11 +500,11 @@ const Charts: React.FC = () => {
           </button>
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
-            <ReactECharts option={exponentialOption} style={{ height: 380 }} />
+            <ReactECharts option={exponentialOption} style={{ height: 380 }} onChartReady={onLegendSelectChanged} />
           </div>
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
-            <ReactECharts option={largeDataOption} style={{ height: 380 }} />
+            <ReactECharts option={largeDataOption} style={{ height: 380 }} onEvents={largeDataEvents} onChartReady={onLegendSelectChanged} />
           </div>
           <div style={{ background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
@@ -486,7 +512,7 @@ const Charts: React.FC = () => {
               ref={barChartRef}
               option={barOption}
               onEvents={barEvents}
-              onChartReady={onBarChartReady}
+              onChartReady={onLineChartReady}
               style={{ height: 320 }}
             />
           </div>
@@ -494,13 +520,14 @@ const Charts: React.FC = () => {
             {/* @ts-ignore */}
             <ReactECharts
               option={lineOption}
+              onEvents={lineEvents}
               onChartReady={onLineChartReady}
               style={{ height: 320 }}
             />
           </div>
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
-            <ReactECharts option={pieOption} style={{ height: 380 }} />
+            <ReactECharts option={pieOption} style={{ height: 380 }} onChartReady={onLegendSelectChanged} />
           </div>
           <div style={{ gridColumn: '1 / -1', background: 'white', padding: 12, borderRadius: 8 }}>
             {/* @ts-ignore */}
