@@ -155,6 +155,7 @@ const Charts: React.FC = () => {
   }
 
   const pieOption = {
+    animation: false,
     title: { text: 'User Distribution', left: 'center' },
     tooltip: { trigger: 'item' },
     legend: { orient: 'vertical', left: 'left' },
@@ -322,6 +323,7 @@ const Charts: React.FC = () => {
   })
 
   const exponentialOption = {
+    animation: false,
     title: { text: 'Exponential Growth', left: 'center' },
     tooltip: { trigger: 'axis' },
     legend: { data: ['Growth 1.9', 'Growth 1.8', 'Growth 1.6', 'Growth 1.5'], top: 30 },
