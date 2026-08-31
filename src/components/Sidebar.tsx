@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Menu } from 'antd'
-import { MenuFoldOutlined, FullscreenOutlined, UnorderedListOutlined, BarChartOutlined } from '@ant-design/icons'
+import { MenuFoldOutlined, FullscreenOutlined, UnorderedListOutlined, BarChartOutlined, TableOutlined } from '@ant-design/icons'
 import type { MenuItemType } from 'antd/es/menu/interface'
 import './Sidebar.css'
 
@@ -111,9 +111,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
       label: 'zustand 예제',
     },
     {
-      key: 'sso-iframe-popup',
-      icon: <UnorderedListOutlined />,
-      label: 'SSO iframe 팝업',
+      key: 'table-diff',
+      icon: <TableOutlined />,
+      label: '테이블 비교',
     },
   ]
 

@@ -35,6 +35,7 @@ import PopupBarChart from './components/PopupBarChart'
 import StringOperations from './components/StringOperations'
 import ZustandExample from './components/ZustandExample'
 import SsoIframePopup from './components/SsoIframePopup'
+import TableDiff from './components/TableDiff'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -44,6 +45,7 @@ function App() {
   const [localRows, setLocalRows] = useState<Employee[]>([])
   const [searchText, setSearchText] = useState('')
   const [gridApi, setGridApi] = useState<GridApi | null>(null)
+  const [activeTab, setActiveTab] = useState('grouped-header')
 
   const queryResult = useQuery<Employee[]>({
     queryKey: ['employees'],
@@ -321,9 +323,13 @@ function App() {
       icon: <AppstoreAddOutlined />,
       children: <SsoIframePopup />,
     },
+    {
+      key: 'table-diff',
+      label: '테이블 비교',
+      icon: <TableOutlined />,
+      children: <TableDiff />,
+    }
   ]
-
-  const [activeTab, setActiveTab] = useState('grouped-header')
 
   const handleNavigate = (key: string) => {
     setActiveTab(key)
