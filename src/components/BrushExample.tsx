@@ -24,7 +24,7 @@ const palette = {
   red: { fill: 'rgba(255, 47, 75, 0.18)', stroke: '#ff2f4b' },
 }
 
-const MIN_SIZE = 20
+const MIN_SIZE = 10
 
 interface BrushExampleContentProps {
   brushRects: BrushRect[]
@@ -217,7 +217,7 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
         {
           type: 'scatter',
           data,
-          symbolSize: 20,
+          symbolSize: MIN_SIZE,
           itemStyle: {
             color: '#2f5cff',
           },
@@ -488,7 +488,7 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
           option={option}
           notMerge={true}
           onChartReady={handleChartReady}
-          style={{ height: 150, width: '100%' }}
+          style={{ height: 450, width: '100%' }}
         />
       </div>
       {showSelectedValues && (
