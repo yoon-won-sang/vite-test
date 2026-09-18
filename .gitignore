@@ -26,3 +26,6 @@ dist-ssr
 # pnpm
 pnpm-lock.yaml
 /litellm_config.yaml
+
+*storybook.log
+storybook-static

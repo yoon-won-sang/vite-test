@@ -111,6 +111,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
       label: 'zustand 예제',
     },
     {
+      key: 'modal-demo',
+      icon: <UnorderedListOutlined />,
+      label: 'zustand 모달 예제',
+    },
+    {
       key: 'table-diff',
       icon: <TableOutlined />,
       label: '테이블 비교',
