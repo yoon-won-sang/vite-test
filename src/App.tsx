@@ -39,6 +39,7 @@ import ZustandModalDemo from './components/ZustandModalDemo'
 import ModalRoot from './components/ModalRoot'
 import SsoIframePopup from './components/SsoIframePopup'
 import TableDiff from './components/TableDiff'
+import ScoreGridExample from './components/ScoreGridExample'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -389,6 +390,12 @@ function App() {
       label: '테이블 비교',
       icon: <TableOutlined />,
       children: <TableDiff />,
+    },
+    {
+      key: 'score-grid',
+      label: '스코어-그리드 예제',
+      icon: <TableOutlined />,
+      children: <ScoreGridExample />,
     }
   ]
 
@@ -406,27 +413,22 @@ function App() {
         />
 
         <div className={`main-content ${collapsed ? 'expanded-content' : ''}`}>
-          <div className="header">
+          {/* <div className="header">
             <h1>🚀 Vite + React + ag-Grid + Ant Design</h1>
             <p>Employee Management System Example</p>
-          </div>
+          </div> */}
 
           <div className="content">
             <ModalRoot />
-            <Tabs
-              activeKey={activeTab}
-              onChange={setActiveTab}
-              defaultActiveKey="grouped-header"
-              items={tabs}
-            />
+            {tabs.find(t => t.key === activeTab)?.children}
           </div>
 
-          <footer className="footer">
+          {/* <footer className="footer">
             <p>
               Built with <strong>Vite</strong> • <strong>React</strong> • <strong>ag-Grid</strong> •{' '}
               <strong>Ant Design</strong>
             </p>
-          </footer>
+          </footer> */}
         </div>
       </div>
     </div>

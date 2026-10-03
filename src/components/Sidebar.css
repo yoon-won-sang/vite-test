@@ -1,5 +1,5 @@
 .sidebar {
-  height: 100vh;
+  height: 100%;
   background: #fff;
   border-right: 1px solid #e8e8e8;
   display: flex;
@@ -11,11 +11,11 @@
 }
 
 .sidebar.collapsed {
-  width: 64px;
+  width: 50px;
 }
 
 .sidebar:not(.collapsed) {
-  width: 280px;
+  width: 200px;
 }
 
 .sidebar-header {
