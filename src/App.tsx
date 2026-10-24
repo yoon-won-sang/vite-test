@@ -40,6 +40,7 @@ import ModalRoot from './components/ModalRoot'
 import SsoIframePopup from './components/SsoIframePopup'
 import TableDiff from './components/TableDiff'
 import ScoreGridExample from './components/ScoreGridExample'
+import ColorSelectExample from './components/ColorSelectExample'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -200,8 +201,6 @@ function App() {
           filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
           onFilter: (value, record) =>
             record.name.toLowerCase().includes((value as string).toLowerCase()),
-          filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-          onFilter: (value, record) => record.name.toLowerCase().includes((value as string).toLowerCase()),
         },
         {
           title: 'Age',
@@ -396,6 +395,12 @@ function App() {
       label: '스코어-그리드 예제',
       icon: <TableOutlined />,
       children: <ScoreGridExample />,
+    },
+    {
+      key: 'color-select',
+      label: '컬러 셀렉트',
+      icon: <BgColorsOutlined />,
+      children: <ColorSelectExample />,
     }
   ]
 

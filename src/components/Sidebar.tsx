@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Menu } from 'antd'
-import { MenuFoldOutlined, FullscreenOutlined, UnorderedListOutlined, BarChartOutlined, TableOutlined, CheckSquareOutlined, SettingOutlined, FormOutlined } from '@ant-design/icons'
-import type { MenuItemType } from 'antd/es/menu/interface'
+import type { MenuProps } from 'antd'
+import { MenuFoldOutlined, FullscreenOutlined, UnorderedListOutlined, BarChartOutlined, TableOutlined, CheckSquareOutlined, SettingOutlined, FormOutlined, BgColorsOutlined } from '@ant-design/icons'
 import './Sidebar.css'
 
 interface SidebarProps {
@@ -14,7 +14,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onCollapse }) => {
   const [openKeys, setOpenKeys] = useState<string[]>([])
 
-  const menuItems: MenuItemType[] = [
+  const menuItems: MenuProps['items'] = [
     {
       key: 'group',
       label: '그리드 예제',
@@ -56,6 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
         { key: 'zustand-example', label: 'zustand 예제', icon: <SettingOutlined /> },
         { key: 'modal-demo', label: 'zustand 모달 예제', icon: <SettingOutlined /> },
         { key: 'sso-iframe-popup', label: 'SSO iframe 팝업', icon: <SettingOutlined /> },
+        { key: 'color-select', label: '컬러 셀렉트', icon: <BgColorsOutlined /> },
         { key: 'example', label: '작업 중', icon: <SettingOutlined /> },
       ],
     },
