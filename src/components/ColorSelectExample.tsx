@@ -15,7 +15,7 @@ const colorOptions = [
   { value: 'green', label: '초록 (Green)', color: '#52c41a' },
   { value: 'cyan', label: '시안 (Cyan)', color: '#13c2c2' },
   { value: 'blue', label: '파랑 (Blue)', color: '#1677ff' },
-  { value: 'purple', label: '보라 (Purple)', color: '#722ed1' },
+  { value: 'purple', label: '보라 (Purple))', color: '#722ed1' },
 ]
 
 // 2. 동그라미 색상 아이콘 컴포넌트
