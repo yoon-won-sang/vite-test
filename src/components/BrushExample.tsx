@@ -48,6 +48,7 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
   setShowSelectedValues,
 }) => {
   const chartRef = useRef<any>(null)
+  const zoomModeRef = useRef<boolean>(false)
   const dragStateRef = useRef<{
     mode: 'create' | 'move' | 'resize'
     rectId?: string
@@ -57,6 +58,7 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
     startRect?: BrushRect
   } | null>(null)
   const brushColorRef = useRef<'blue' | 'red'>('blue')
+  const [isBrushMode, setIsBrushMode] = useState(false)
   const [tempRect, setTempRect] = useState<BrushRect | null>(null)
 
   const data = useMemo(
@@ -213,6 +215,23 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
         top: '16%',
         bottom: '12%',
       },
+      dataZoom: [
+        { type: 'inside', xAxisIndex: 0 },
+        { type: 'inside', yAxisIndex: 0 },
+        { type: 'slider', xAxisIndex: 0, height: 18, bottom: 4 },
+      ],
+      toolbox: {
+        show: true,
+        right: 16,
+        top: 8,
+        feature: {
+          saveAsImage: { title: '이미지로 저장' },
+          restore: { title: '복원' },
+          dataView: { title: '데이터 보기', readOnly: false },
+          dataZoom: { title: { zoom: '영역 줌', back: '줌 초기화' } },
+          magicType: { title: { line: '라인', bar: '막대' }, type: ['line', 'bar'] },
+        },
+      },
       series: [
         {
           type: 'scatter',
@@ -230,20 +249,34 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
   const handleChartReady = useCallback(
     (chart: any) => {
       chartRef.current = chart
+      chart.on("takeGlobalCursor", (params: any) => {
+        // dataZoomSelect가 활성화되어 있는지 명확히 확인
+        zoomModeRef.current = !!(params && params.key === "dataZoomSelect" && params.dataZoomSelectActive);
+      });
       const zr = chart.getZr?.()
       if (!zr) return
 
+      chart.on('click', (params: any) => {
+        if (params.componentType === 'toolbox') {
+          // 데이터 줌 기능 등 툴박스 도구 클릭 시 브러쉬 모드 자동 해제
+          setIsBrushMode(false)
+        }
+      })
+
       const shouldIgnoreTarget = (target: any) => {
         if (!target) return false
-        if (typeof target.id === 'string') {
-          return (
-            target.id.startsWith('brush-') ||
-            target.id === '__temp__' ||
-            target.id.includes('-handle-')
-          )
+
+        // ECharts toolbox 아이콘 영역 체크
+        let cur = target
+        while (cur) {
+          if (cur.id?.includes('toolbox')) return true
+          if (cur.parent?.id?.includes('toolbox')) return true
+          if (cur.__title != null) return true
+          cur = cur.parent
         }
-        return false
-      }
+
+        // ... 기존 코드
+
 
       const handleMouseMove = (event: any) => {
         if (!dragStateRef.current) return
@@ -369,6 +402,8 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
       }
 
       const handleGlobalMouseDown = (event: any) => {
+        // 브러쉬 모드가 아니거나 줌 모드인 경우 로직 중지
+        if (!isBrushMode || zoomModeRef.current) return
         if (event.which !== 1) return
         if (shouldIgnoreTarget(event.target)) return
         event?.stopPropagation?.()
@@ -392,7 +427,7 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
         zr.off('mouseup', handleMouseUp)
       }
     },
-    [getEventXY],
+    [getEventXY, isBrushMode],
   )
 
   // useEffect(() => {
@@ -470,17 +505,20 @@ const BrushExampleContent: React.FC<BrushExampleContentProps> = ({
         </button>
         <button
           type="button"
-          onClick={() => setShowSelectedValues((prev) => !prev)}
+          onClick={() => {
+            setIsBrushMode(!isBrushMode)
+            zoomModeRef.current = false
+          }}
           style={{
-            border: '1px solid #006cff',
-            background: '#f4f9ff',
-            color: '#0047b3',
+            border: isBrushMode ? '2px solid #52c41a' : '1px solid #cccccc',
+            background: isBrushMode ? '#f6ffed' : '#ffffff',
+            color: '#389e0d',
             padding: '8px 14px',
             borderRadius: 6,
             cursor: 'pointer',
           }}
         >
-          {showSelectedValues ? 'Hide Selected Values' : 'Show Selected Values'}
+          {isBrushMode ? 'Brush Mode ON' : 'Brush Mode OFF'}
         </button>
       </div>
       <div style={{ background: 'white', padding: 12, borderRadius: 10 }}>
