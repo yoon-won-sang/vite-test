@@ -20,14 +20,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
       label: '그리드 예제',
       type: 'group',
       children: [
-        { key: 'grouped-header', label: '그룹 헤더', icon: <UnorderedListOutlined /> },
+        { key: 'grouped-header', label: '그룹 헤더', icon: <TableOutlined /> },
         { key: 'table', label: 'AntD 테이블', icon: <TableOutlined /> },
         { key: 'grid', label: 'ag-Grid 무한 스크롤', icon: <TableOutlined /> },
-        { key: 'checkbox-grid', label: '체크박스 선택', icon: <CheckSquareOutlined /> },
-        { key: 'checkbox-matrix', label: '체크박스 매트릭스', icon: <CheckSquareOutlined /> },
-        { key: 'column-handling', label: '컬럼 처리', icon: <SettingOutlined /> },
+        { key: 'checkbox-grid', label: '체크박스 선택', icon: <TableOutlined /> },
+        { key: 'checkbox-matrix', label: '체크박스 매트릭스', icon: <TableOutlined /> },
+        { key: 'column-handling', label: '컬럼 처리', icon: <TableOutlined /> },
         { key: 'table-diff', label: '테이블 비교', icon: <TableOutlined /> },
         { key: 'score-grid', label: '스코어-그리드 예제', icon: <TableOutlined /> },
+        { key: 'example', label: 'ag-Grid Cell CheckBox', icon: <TableOutlined /> },
       ],
     },
     {
@@ -57,7 +58,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
         { key: 'modal-demo', label: 'zustand 모달 예제', icon: <SettingOutlined /> },
         { key: 'sso-iframe-popup', label: 'SSO iframe 팝업', icon: <SettingOutlined /> },
         { key: 'color-select', label: '컬러 셀렉트', icon: <BgColorsOutlined /> },
-        { key: 'example', label: '작업 중', icon: <SettingOutlined /> },
       ],
     },
   ]
