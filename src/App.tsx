@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { Form, Tabs, message, Tag, Input, Space, Button } from 'antd'
+import { Form, message, Tag, Input, Space, Button } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnsType } from 'antd/es/table'
 import type { GridApi } from 'ag-grid-community'
@@ -152,91 +152,91 @@ function App() {
     form.resetFields()
   }
 
-      const antdColumns: ColumnsType<Employee> = [
-        {
-          title: 'ID',
-          dataIndex: 'id',
-          key: 'id',
-          width: 80,
-          sorter: (a, b) => a.id - b.id,
-        },
-        {
-          title: 'Name',
-          dataIndex: 'name',
-          key: 'name',
-          width: 150,
-          sorter: (a, b) => a.name.localeCompare(b.name),
-          filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-              <Input
-                autoFocus
-                placeholder="Search name"
-                value={selectedKeys[0]}
-                onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                onPressEnter={() => confirm()}
-                style={{ marginBottom: 8, display: 'block' }}
-              />
-              <Space>
-                <Button
-                  type="primary"
-                  onClick={() => confirm()}
-                  size="small"
-                  style={{ width: 90 }}
-                >
-                  Search
-                </Button>
-                <Button
-                  onClick={() => {
-                    clearFilters && clearFilters()
-                    confirm({ closeDropdown: true })
-                  }}
-                  size="small"
-                  style={{ width: 90 }}
-                >
-                  Reset
-                </Button>
-              </Space>
-            </div>
-          ),
-          filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-          onFilter: (value, record) =>
-            record.name.toLowerCase().includes((value as string).toLowerCase()),
-        },
-        {
-          title: 'Age',
-          dataIndex: 'age',
-          key: 'age',
-          width: 100,
-          sorter: (a, b) => a.age - b.age,
-        },
-        {
-          title: 'Department',
-          dataIndex: 'department',
-          key: 'department',
-          width: 150,
-          sorter: (a, b) => a.department.localeCompare(b.department),
-          filters: [
-            { text: 'Engineering', value: 'Engineering' },
-            { text: 'Design', value: 'Design' },
-            { text: 'HR', value: 'HR' },
-          ],
-          onFilter: (value, record) => record.department === value,
-        },
-        {
-          title: 'Status',
-          dataIndex: 'status',
-          key: 'status',
-          render: (status: Employee['status']) => {
-            const color = status === 'Active' ? 'green' : 'red'
-            return <Tag color={color}>{status}</Tag>
-          },
-          filters: [
-            { text: 'Active', value: 'Active' },
-            { text: 'Inactive', value: 'Inactive' },
-          ],
-          onFilter: (value, record) => record.status === value,
-        },
-      ]
+  const antdColumns: ColumnsType<Employee> = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: 80,
+      sorter: (a, b) => a.id - b.id,
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: 150,
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+          <Input
+            autoFocus
+            placeholder="Search name"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters && clearFilters()
+                confirm({ closeDropdown: true })
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record.name.toLowerCase().includes((value as string).toLowerCase()),
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+      width: 100,
+      sorter: (a, b) => a.age - b.age,
+    },
+    {
+      title: 'Department',
+      dataIndex: 'department',
+      key: 'department',
+      width: 150,
+      sorter: (a, b) => a.department.localeCompare(b.department),
+      filters: [
+        { text: 'Engineering', value: 'Engineering' },
+        { text: 'Design', value: 'Design' },
+        { text: 'HR', value: 'HR' },
+      ],
+      onFilter: (value, record) => record.department === value,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: Employee['status']) => {
+        const color = status === 'Active' ? 'green' : 'red'
+        return <Tag color={color}>{status}</Tag>
+      },
+      filters: [
+        { text: 'Active', value: 'Active' },
+        { text: 'Inactive', value: 'Inactive' },
+      ],
+      onFilter: (value, record) => record.status === value,
+    },
+  ]
 
   const tabs = [
     {
