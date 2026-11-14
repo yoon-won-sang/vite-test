@@ -41,7 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
     'color-select': 'ColorSelectExample.tsx',
   }
 
-  const getMenuItem = (key: string, label: string, icon: React.ReactNode): MenuProps['items'][number] => ({
+  const getMenuItem = (key: string, label: string, icon: React.ReactNode): NonNullable<MenuProps['items']>[number] => ({
     key,
     label: (
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
