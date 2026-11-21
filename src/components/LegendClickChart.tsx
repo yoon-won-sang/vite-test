@@ -52,6 +52,12 @@ const LegendClickChart: React.FC = () => {
           left: 'center',
           data: ['방문자', '비용'],
           itemGap: 24,
+          selected: {
+            '매출': true,
+            '수익': true,
+            '방문자': false,
+            '비용': false,
+          },
         },
       ],
       grid: {
@@ -101,4 +107,3 @@ const LegendClickChart: React.FC = () => {
 }
 
 export default LegendClickChart
-
