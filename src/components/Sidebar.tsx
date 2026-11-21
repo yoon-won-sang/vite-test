@@ -39,6 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
     'modal-demo': 'ZustandModalDemo.tsx',
     'sso-iframe-popup': 'SsoIframePopup.tsx',
     'color-select': 'ColorSelectExample.tsx',
+    'legend-click': 'LegendClickChart.tsx',
   }
 
   const getMenuItem = (key: string, label: string, icon: React.ReactNode): NonNullable<MenuProps['items']>[number] => ({
@@ -81,6 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeKey, onNavigate, collapsed, onC
         getMenuItem('simple-line-example', '라인차트', <BarChartOutlined />),
         getMenuItem('chart-tab-example', '탭 안 차트', <BarChartOutlined />),
         getMenuItem('popup-bar-chart', '막대차트 팝업', <BarChartOutlined />),
+        getMenuItem('legend-click', '레전드 클릭', <BarChartOutlined />),
       ],
     },
     {

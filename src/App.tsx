@@ -41,6 +41,7 @@ import SsoIframePopup from './components/SsoIframePopup'
 import TableDiff from './components/TableDiff'
 import ScoreGridExample from './components/ScoreGridExample'
 import ColorSelectExample from './components/ColorSelectExample'
+import LegendClickChart from './components/LegendClickChart'
 import type { Employee, EmployeeFormValues } from './types/employee'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -401,7 +402,13 @@ function App() {
       label: '컬러 셀렉트',
       icon: <BgColorsOutlined />,
       children: <ColorSelectExample />,
-    }
+    },
+    {
+      key: 'legend-click',
+      label: '레전드 클릭',
+      icon: <BarChartOutlined />,
+      children: <LegendClickChart />,
+    },
   ]
 
   const handleNavigate = (key: string) => {
